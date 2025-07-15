@@ -1,0 +1,229 @@
+<div
+  class="sidebar h-screen flex flex-col"
+  [ngClass]="{ 'sidebar-collapsed': isSidebarCollapsed }"
+>
+  <div class="sidebar-header">
+    <a href="#" class="sidebar-logo flex items-center gap-2">
+      <div class="icon-bg">
+        <fa-icon size="lg" class="logo" [icon]="faCalendar"></fa-icon>
+      </div>
+      <div *ngIf="!isSidebarCollapsed">
+        <h2 style="color: #233b62; font-weight: bold">LeaveSync</h2>
+        <p style="font-size: small; color: rgb(155, 151, 151)">
+          Employee Portal
+        </p>
+      </div>
+    </a>
+  </div>
+  <div class="border-1 border-gray-200"></div>
+  <div class="flex flex-col justify-between h-full">
+    <div class="sidebar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active-link" class="sidebar-item" [routerLinkActiveOptions]="{ exact: true }">
+
+        <svg
+        class="sidebar-icon"
+          width="25px"
+          height="25px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+            <path
+              d="M15 18H9"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+          </g>
+        </svg>
+        <div *ngIf="!isSidebarCollapsed">
+          <p class="sidebar-text">Dashboard</p>
+        </div>
+      </a>
+      <a routerLink="/myRequests" routerLinkActive="active-link" class="sidebar-item" [routerLinkActiveOptions]="{ exact: true }">
+        <svg
+        class="sidebar-icon"
+          width="25px"
+          height="25px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M9 17H15M9 13H15M9 9H10M13 3H8.2C7.0799 3 6.51984 3 6.09202 3.21799C5.71569 3.40973 5.40973 3.71569 5.21799 4.09202C5 4.51984 5 5.0799 5 6.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.0799 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V9M13 3L19 9M13 3V7.4C13 7.96005 13 8.24008 13.109 8.45399C13.2049 8.64215 13.3578 8.79513 13.546 8.89101C13.7599 9 14.0399 9 14.6 9H19"
+              stroke="#6a7282"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </g>
+        </svg>
+        <div *ngIf="!isSidebarCollapsed">
+          <p class="sidebar-text">My Requests</p>
+        </div>
+      </a>
+      <a routerLink="/ApplyLeave" routerLinkActive="active-link" class="sidebar-item" [routerLinkActiveOptions]="{ exact: true }">
+        <svg
+        class="sidebar-icon"
+          width="25px"
+          height="25px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+            <path
+              d="M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C21.5093 4.43821 21.8356 5.80655 21.9449 8"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+          </g>
+        </svg>
+        <div *ngIf="!isSidebarCollapsed">
+          <p class="sidebar-text">Apply Leave</p>
+        </div>
+      </a>
+      <a routerLink="/CalendarLeave" routerLinkActive="active-link" class="sidebar-item" [routerLinkActiveOptions]="{ exact: true }">
+        <svg
+        class="sidebar-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          width="25px"
+          height="25px"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M7 4V2.5"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+            <path
+              d="M17 4V2.5"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+            <circle
+              cx="16.5"
+              cy="16.5"
+              r="1.5"
+              stroke="#6a7282"
+              stroke-width="1.5"
+            ></circle>
+            <path
+              d="M21.5 9H16.625H10.75M2 9H5.875"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+            <path
+              d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985"
+              stroke="#6a7282"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            ></path>
+          </g>
+        </svg>
+        <div *ngIf="!isSidebarCollapsed">
+          <p class="sidebar-text">Calendar</p>
+        </div>
+      </a>
+      <a routerLink="/" routerLinkActive="active-link" class="sidebar-item" [routerLinkActiveOptions]="{ exact: true }">
+        <svg
+          fill="#6a7282"
+          width="25px"
+          height="25px"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M20,3a1,1,0,0,0,0-2H4A1,1,0,0,0,4,3H5.049c.146,1.836.743,5.75,3.194,8-2.585,2.511-3.111,7.734-3.216,10H4a1,1,0,0,0,0,2H20a1,1,0,0,0,0-2H18.973c-.105-2.264-.631-7.487-3.216-10,2.451-2.252,3.048-6.166,3.194-8Zm-6.42,7.126a1,1,0,0,0,.035,1.767c2.437,1.228,3.2,6.311,3.355,9.107H7.03c.151-2.8.918-7.879,3.355-9.107a1,1,0,0,0,.035-1.767C7.881,8.717,7.227,4.844,7.058,3h9.884C16.773,4.844,16.119,8.717,13.58,10.126ZM12,13s3,2.4,3,3.6V20H9V16.6C9,15.4,12,13,12,13Z"
+            ></path>
+          </g>
+        </svg>
+        <div *ngIf="!isSidebarCollapsed">
+          <p class="sidebar-text">Leave Balance</p>
+        </div>
+      </a>
+    </div>
+    <div>
+      <div class="border-t border-gray-200 my-2"></div>
+
+      <div class="sidebar-item cursor-pointer">
+        <svg
+          width="20px"
+          height="20px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M21.593 10.943c.584.585.584 1.53 0 2.116L18.71 15.95c-.39.39-1.03.39-1.42 0a.996.996 0 0 1 0-1.41 9.552 9.552 0 0 1 1.689-1.345l.387-.242-.207-.206a10 10 0 0 1-2.24.254H8.998a1 1 0 1 1 0-2h7.921a10 10 0 0 1 2.24.254l.207-.206-.386-.241a9.562 9.562 0 0 1-1.69-1.348.996.996 0 0 1 0-1.41c.39-.39 1.03-.39 1.42 0l2.883 2.893zM14 16a1 1 0 0 0-1 1v1.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1.505a1 1 0 1 0 2 0V5.5A2.5 2.5 0 0 0 12.5 3h-7A2.5 2.5 0 0 0 3 5.5v13A2.5 2.5 0 0 0 5.5 21h7a2.5 2.5 0 0 0 2.5-2.5V17a1 1 0 0 0-1-1z"
+              fill="#5e5565"
+            ></path>
+          </g>
+        </svg>
+        <div *ngIf="!isSidebarCollapsed">
+          <p style="color: #5e5565 color">Sign Out</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

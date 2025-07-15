@@ -1,0 +1,52 @@
+<div class="dashboard space-y-6">
+
+    <div class="flex flex-row justify-between items-center">
+      <h1 class="title">Welcome Back, Name!</h1>
+      <button
+        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+      >
+        <fa-icon [icon]="faPlus"></fa-icon>
+        <span>Apply for Leave</span>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <app-card
+        title="Available Leave"
+        [value]="'18'"
+        subtitle="days remaining"
+        [icon]="faCalendar"
+        bgColor="bg-blue-100"
+        iconColor="text-blue-600"
+      ></app-card>
+  
+      <app-card
+        title="Used This Year"
+        [value]="'7'"
+        subtitle="days taken"
+        [icon]="faClock"
+        bgColor="bg-green-100"
+        iconColor="text-green-600"
+      ></app-card>
+  
+      <app-card
+        title="Pending Requests"
+        [value]="'1'"
+        subtitle="awaiting approval"
+        [icon]="faClipboard"
+        bgColor="bg-yellow-100"
+        iconColor="text-yellow-600"
+      ></app-card>
+  
+      <app-card
+        title="Approved Requests"
+        [value]="'3'"
+        subtitle="this year"
+        [icon]="faCheckCircle"
+        bgColor="bg-purple-100"
+        iconColor="text-purple-600"
+      ></app-card>
+    </div>
+    <app-recent-leave></app-recent-leave>
+  </div>
+  

@@ -1,0 +1,14 @@
+<div class="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm w-full">
+
+    <div>
+      <p class="text-sm text-gray-600 font-medium">{{ title }}</p>
+      <h1 class="text-3xl font-bold text-gray-900">{{ value }}</h1>
+      <p class="text-sm text-gray-400">{{ subtitle }}</p>
+    </div>
+  
+
+    <div [ngClass]="[bgColor, 'rounded-lg p-2']">
+      <fa-icon [icon]="icon" [ngClass]="[iconColor, 'text-xl']"></fa-icon>
+    </div>
+  </div>
+  

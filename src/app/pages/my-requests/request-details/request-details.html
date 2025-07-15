@@ -1,0 +1,87 @@
+<!-- Frosted Glass Blur Backdrop -->
+<div
+  class="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50"
+>
+  <!-- Modal Card -->
+  <div
+    class="bg-white w-full max-w-md p-6 rounded-2xl shadow-2xl border border-gray-200 animate-fade-in"
+  >
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Request Details</h2>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="grid gap-3 text-sm text-gray-700">
+      <div class="flex justify-between">
+        <span class="font-medium text-gray-500">Type:</span>
+        <span>{{ request?.type }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium text-gray-500">Start Date:</span>
+        <span>{{ request?.startDate }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium text-gray-500">End Date:</span>
+        <span>{{ request?.endDate }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium text-gray-500">Days:</span>
+        <span>{{ request?.days }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="font-medium text-gray-500">Status:</span>
+        <span
+          class="px-3 py-1 rounded-full text-xs font-semibold"
+          [ngClass]="{
+            'bg-green-100 text-green-700': request?.status === 'Approved',
+            'bg-yellow-100 text-yellow-700': request?.status === 'Pending',
+            'bg-red-100 text-red-700': request?.status === 'Rejected'
+          }"
+        >
+          {{ request?.status }}
+        </span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium text-gray-500">Submitted:</span>
+        <span>{{ request?.submitted }}</span>
+      </div>
+    </div>
+
+<!-- Footer -->
+<div class="mt-6 flex justify-end gap-3">
+    <!-- Cancel button only if status is 'Pending' -->
+    <button
+      *ngIf="request?.status === 'Pending'"
+      (click)="cancelRequest()"
+      class="bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2 rounded-md text-sm font-medium transition"
+    >
+      Cancel Request
+    </button>
+  
+    <button
+      (click)="closeModal()"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+    >
+      Close
+    </button>
+  </div>
+  
+  </div>
+</div>

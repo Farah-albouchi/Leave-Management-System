@@ -1,0 +1,31 @@
+.navbar {
+    background-color: white ;
+    padding : 15px ; 
+    display: flex;
+    flex-direction: row;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+}
+.partOne {
+    display: flex;
+    flex-direction: row;
+    gap:12px ;
+    justify-content: center;
+    align-items: center;
+}
+.iconProfile {
+    background-color: #2563EB;
+    border-radius: 100%;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+}
+.partTwo{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+} 

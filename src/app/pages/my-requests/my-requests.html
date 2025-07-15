@@ -1,0 +1,186 @@
+<div class="p-6 rounded-lg">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold">My Leave Requests</h2>
+      <p class="text-sm text-gray-500">
+        View and manage your leave applications
+      </p>
+    </div>
+    <button
+      class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+    >
+      <fa-icon [icon]="faPlus"></fa-icon>
+      <span>Apply for Leave</span>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg p-4 m-2 shadow-sm">
+    <h3 class="text-2xl font-semibold mb-4">Request History</h3>
+
+    <div class="flex justify-end items-center mb-4 gap-2">
+      <div
+        class="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1 bg-white shadow-sm"
+      >
+        <svg
+          width="18px"
+          height="18px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M3 4.6C3 4.03995 3 3.75992 3.10899 3.54601C3.20487 3.35785 3.35785 3.20487 3.54601 3.10899C3.75992 3 4.03995 3 4.6 3H19.4C19.9601 3 20.2401 3 20.454 3.10899C20.6422 3.20487 20.7951 3.35785 20.891 3.54601C21 3.75992 21 4.03995 21 4.6V6.33726C21 6.58185 21 6.70414 20.9724 6.81923C20.9479 6.92127 20.9075 7.01881 20.8526 7.10828C20.7908 7.2092 20.7043 7.29568 20.5314 7.46863L14.4686 13.5314C14.2957 13.7043 14.2092 13.7908 14.1474 13.8917C14.0925 13.9812 14.0521 14.0787 14.0276 14.1808C14 14.2959 14 14.4182 14 14.6627V17L10 21V14.6627C10 14.4182 10 14.2959 9.97237 14.1808C9.94787 14.0787 9.90747 13.9812 9.85264 13.8917C9.7908 13.7908 9.70432 13.7043 9.53137 13.5314L3.46863 7.46863C3.29568 7.29568 3.2092 7.2092 3.14736 7.10828C3.09253 7.01881 3.05213 6.92127 3.02763 6.81923C3 6.70414 3 6.58185 3 6.33726V4.6Z"
+              stroke="#364153"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </g>
+        </svg>
+
+        <select
+          class="appearance-none bg-transparent focus:outline-none text-sm text-gray-700"
+        >
+          <option>All Status</option>
+          <option>Approved</option>
+          <option>Pending</option>
+          <option>Rejected</option>
+        </select>
+
+        <svg
+          class="w-4 h-4 text-gray-400 ml-auto"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+
+      <div
+        class="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1 bg-white shadow-sm"
+      >
+        <svg
+          width="18px"
+          height="18px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15"
+              stroke="#364153"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+            <path
+              d="M12 3V16M12 16L16 11.625M12 16L8 11.625"
+              stroke="#364153"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </g>
+        </svg>
+        <button class="text-gray-700 text-sm">Export</button>
+      </div>
+    </div>
+
+    <table class="w-full text-left text-sm">
+      <thead class="text-gray-600 border-b border-gray-300">
+        <tr>
+          <th class="py-2">Type</th>
+          <th class="py-2">Start Date</th>
+          <th class="py-2">End Date</th>
+          <th class="py-2">Days</th>
+          <th class="py-2">Status</th>
+          <th class="py-2">Submitted</th>
+          <th class="py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let request of leaveRequests"
+          class="border-b hover:bg-gray-50 transition border-gray-300"
+        >
+          <td class="py-5 font-medium">{{ request.type }}</td>
+          <td class="py-5">{{ request.startDate }}</td>
+          <td class="py-5">{{ request.endDate }}</td>
+          <td class="py-5">{{ request.days }}</td>
+          <td class="py-5">
+            <span
+              [ngClass]="{
+                'bg-green-100 text-green-700': request.status === 'Approved',
+                'bg-yellow-100 text-yellow-700': request.status === 'Pending',
+                'bg-red-100 text-red-700': request.status === 'Rejected'
+              }"
+              class="px-2 py-1 text-xs font-medium rounded-full"
+              >{{ request.status }}</span
+            >
+          </td>
+          <td class="py-2">{{ request.submitted }}</td>
+          <td class="py-2">
+            <svg
+            (click)="openModal(request)"
+            class="cursor-pointer text-gray-600 hover:text-black"
+              width="20px"
+              height="20px"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M3.27489 15.2957C2.42496 14.1915 2 13.6394 2 12C2 10.3606 2.42496 9.80853 3.27489 8.70433C4.97196 6.49956 7.81811 4 12 4C16.1819 4 19.028 6.49956 20.7251 8.70433C21.575 9.80853 22 10.3606 22 12C22 13.6394 21.575 14.1915 20.7251 15.2957C19.028 17.5004 16.1819 20 12 20C7.81811 20 4.97196 17.5004 3.27489 15.2957Z"
+                  stroke="#1C274C"
+                  stroke-width="1.5"
+                ></path>
+                <path
+                  d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
+                  stroke="#1C274C"
+                  stroke-width="1.5"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <app-request-details
+  *ngIf="showModal"
+  [request]="selectedRequest"
+  (close)="closeModal()"
+  (cancel)="handleCancelRequest()"
+></app-request-details>
+
+  
+
+  </div>
+</div>

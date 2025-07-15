@@ -1,0 +1,23 @@
+<div class="bg-white rounded-xl shadow-sm p-4 border border-blue-200">
+    <h2 class="text-lg font-semibold mb-4">Recent Leave Requests</h2>
+    <hr class="mb-4  border-1 border-blue-100 " />
+  
+    <div *ngFor="let request of leaveRequests" class="flex justify-between items-center bg-gray-50 rounded-lg p-4 mb-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <p class="font-semibold text-gray-900">{{ request.type }}</p>
+          <span
+            class="text-xs font-medium px-2 py-0.5 rounded-full"
+            [ngClass]="[request.statusBg, request.statusColor]"
+          >
+            {{ request.status }}
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">{{ request.dateRange }}</p>
+      </div>
+      <div class="text-sm font-semibold text-gray-900">
+        {{ request.days }}
+      </div>
+    </div>
+  </div>
+  

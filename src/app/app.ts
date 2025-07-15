@@ -1,12 +1,30 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { SidebarComponent } from './components/sidebar/sidebar';
+import { Navbar } from './components/navbar/navbar';
+import { Dashboard } from './pages/dashboard/dashboard';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    CommonModule,         
+    SidebarComponent  ,  
+    FontAwesomeModule, 
+    Navbar,
+    Dashboard
+    
+  ],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
-  protected title = 'frontend';
+  isSidebarCollapsed = false;
+
+  onSidebarToggle() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
 }

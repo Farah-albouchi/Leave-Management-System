@@ -1,0 +1,88 @@
+<div class="max-w-4xl mx-auto p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Apply for Leave</h1>
+  
+    <form (ngSubmit)="onSubmit()" class="bg-white rounded-lg shadow-md p-6 space-y-6">
+  
+      <!-- Leave Type & Half Day -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">Leave Type *</label>
+          <select [(ngModel)]="form.type" name="type"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+            <option disabled selected>Select leave type</option>
+            <option *ngFor="let type of leaveTypes">{{ type }}</option>
+          </select>
+        </div>
+  
+        <div class="flex items-center gap-3 mt-6">
+          <input type="checkbox" [(ngModel)]="form.halfDay" name="halfDay" (change)="onHalfDayToggle()" />
+          <label class="text-sm text-gray-600">Half Day</label>
+        </div>
+      </div>
+  
+      <!-- Start & End Date -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">Start Date *</label>
+          <input type="date" [(ngModel)]="form.startDate" name="startDate"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            (change)="onDateChange()" />
+        </div>
+  
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">End Date *</label>
+          <input type="date" [(ngModel)]="form.endDate" name="endDate"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            (change)="onDateChange()" />
+        </div>
+      </div>
+  
+      <!-- Calculated Days -->
+      <div>
+        <label class="block mb-1 text-sm font-medium text-gray-700">Total Days</label>
+        <input
+          type="text"
+          [value]="form.days"
+          readonly
+          class="w-full bg-gray-100 text-gray-700 border border-gray-300 rounded-md px-3 py-2 text-sm"
+        />
+      </div>
+  
+      <!-- Reason -->
+      <div>
+        <label class="block mb-1 text-sm font-medium text-gray-700">Reason *</label>
+        <textarea
+          [(ngModel)]="form.reason"
+          name="reason"
+          rows="4"
+          placeholder="Explain your reason..."
+          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+        ></textarea>
+      </div>
+  
+      <!-- Upload Document -->
+      <div>
+        <label class="block mb-1 text-sm font-medium text-gray-700">Upload Supporting Document</label>
+        <input
+          type="file"
+          (change)="onFileChange($event)"
+          accept=".pdf,.jpg,.png,.docx"
+          class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0 file:text-sm file:font-semibold
+            file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        <div *ngIf="form.document" class="mt-1 text-sm text-gray-500">
+          Selected: {{ form.document.name }}
+        </div>
+      </div>
+  
+      <!-- Submit -->
+      <div class="text-end">
+        <button type="submit"
+          class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+          Submit Request
+        </button>
+      </div>
+    </form>
+  </div>
+  
