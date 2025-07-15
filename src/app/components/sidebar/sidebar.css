@@ -153,8 +153,9 @@
     padding: 6px 10px;
     border-radius: 10px;
   }
-  .active-link {
+  .active-link .sidebar-icon path {
     background-color: #eef;
+    color: #2563eb
     /* font-weight: bold; */
   }
   

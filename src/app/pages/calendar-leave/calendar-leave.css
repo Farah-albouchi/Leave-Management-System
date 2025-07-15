@@ -1,0 +1,12 @@
+::ng-deep .custom-day-sick-leave {
+    background-color: #0f172a !important;
+    color: white !important;
+    border-radius: 9999px;
+  }
+  
+  ::ng-deep .custom-day-annual-leave {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-radius: 9999px;
+  }
+  

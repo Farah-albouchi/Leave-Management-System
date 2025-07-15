@@ -31,6 +31,7 @@
   </div>
   <div class="partTwo">
     <div class="relative">
+      <div (click)="toggleNotifications()" class="cursor-pointer relative">
         <svg
           width="25px"
           height="25px"
@@ -74,6 +75,33 @@
         <span
           class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"
         ></span>
+      </div>
+      <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg z-50">
+        <div class="p-4 border-b flex justify-between items-center">
+          <h3 class="font-bold text-lg">Notifications</h3>
+          <a class="text-sm text-blue-600 cursor-pointer hover:underline">Mark all read</a>
+        </div>
+    
+        <div class="max-h-96 overflow-y-auto">
+          <div *ngFor="let n of notifications" [ngClass]="{ 'bg-blue-50': !n.read }" class="px-4 py-3 border-b hover:bg-gray-50">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="font-semibold text-sm">
+                  <span [ngSwitch]="n.type">
+                    <span *ngSwitchCase="'success'" class="text-green-600">✔</span>
+                    <span *ngSwitchCase="'info'" class="text-blue-600">🕒</span>
+                    <span *ngSwitchCase="'warning'" class="text-yellow-600">⚠️</span>
+                  </span>
+                  {{ n.title }}
+                </p>
+                <p class="text-sm text-gray-600 mt-1">{{ n.message }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ n.time }}</p>
+              </div>
+              <span *ngIf="!n.read" class="h-2 w-2 rounded-full bg-blue-600 mt-1.5"></span>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
       
     <div class="h-full w-px bg-gray-300 mx-2"></div>

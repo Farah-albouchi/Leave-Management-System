@@ -1,74 +1,76 @@
 <div class="p-6">
-    <h1 class="text-3xl font-bold mb-1">Leave Calendar</h1>
-    <p class="text-gray-500 mb-6">View your approved leave schedule</p>
-  
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Calendar -->
-      <div class="lg:col-span-2 p-6 bg-white rounded-lg shadow">
-        <h2 class="text-2xl font-semibold mb-4">Calendar View</h2>
-  
-        <!-- Navigation -->
-        <div class="flex items-center justify-between mb-4">
-          <button (click)="prevMonth()" class="text-gray-600 hover:text-black">←</button>
-          <span class="text-lg font-medium">{{ currentMonth | date: 'MMMM yyyy' }}</span>
-          <button (click)="nextMonth()" class="text-gray-600 hover:text-black">→</button>
-        </div>
-  
-        <!-- Calendar Grid -->
-        <div class="grid grid-cols-7 gap-1 text-center text-sm text-gray-600">
-          <div *ngFor="let day of weekDays">{{ day }}</div>
-          <div
-            *ngFor="let day of calendarDays"
-            class="h-10 w-10 flex items-center justify-center rounded-full"
-            [ngClass]="{
-              'bg-blue-500 text-white': isLeaveDay(day),
-              'text-gray-400': day.isOtherMonth,
-              'bg-gray-100': !isLeaveDay(day) && !day.isOtherMonth,
-              'ring ring-blue-700': isToday(day.date)
-            }"
-          >
-            {{ day.date.getDate() }}
+  <h1 class="text-3xl font-bold mb-1">Leave Calendar</h1>
+  <p class="text-gray-500 mb-6">View your approved leave schedule</p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Calendar -->
+    <div class="lg:col-span-2 p-6 bg-white rounded-lg shadow">
+        <div class="flex justify-between items-center mb-4">
+            <button (click)="prevMonth()" class="text-lg px-2">←</button>
+            <span class="text-xl font-semibold">{{ currentMonth | date: 'MMMM yyyy' }}</span>
+            <button (click)="nextMonth()" class="text-lg px-2">→</button>
           </div>
+        
+          <div class="grid grid-cols-7 text-center font-medium text-gray-700 mb-2">
+            <div *ngFor="let day of weekDays">{{ day }}</div>
+          </div>
+        
+          <div class="grid grid-cols-7 gap-1 text-center">
+            <div
+              *ngFor="let day of calendarDays"
+              class="h-16 flex items-center justify-center rounded-lg text-sm"
+              [ngClass]="{
+                'text-gray-400': day.isOtherMonth,
+                'bg-blue-100 text-blue-800': getLeaveType(day.date) === 'annual',
+                'bg-red-100 text-red-800': getLeaveType(day.date) === 'sick',
+                'border-2 border-blue-500': isToday(day.date)
+              }"
+            >
+              {{ day.date.getDate() }}
+            </div>
+          </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Filter -->
+      <div class="flex justify-end">
+        <select class="border border-gray-300 rounded-md p-2 text-sm w-full">
+          <option>All Types</option>
+          <option>Annual Leave</option>
+          <option>Sick Leave</option>
+        </select>
+      </div>
+
+      <!-- Legend -->
+      <div class="bg-white rounded-lg p-4 shadow">
+        <h3 class="text-xl font-bold mb-2">Legend</h3>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="h-4 w-4 bg-blue-200 rounded inline-block"></span>
+          <span>Leave Days</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="h-4 w-4 bg-gray-200 rounded inline-block"></span>
+          <span>Available Days</span>
         </div>
       </div>
-  
-      <!-- Sidebar -->
-      <div class="space-y-6">
-        <!-- Filter -->
-        <div class="flex justify-end">
-          <select class="border border-gray-300 rounded-md p-2 text-sm w-full">
-            <option>All Types</option>
-            <option>Annual Leave</option>
-            <option>Sick Leave</option>
-          </select>
+
+      <!-- Upcoming Leaves -->
+      <div class="bg-white rounded-lg p-4 shadow">
+        <h3 class="text-xl font-bold mb-3">Upcoming Leaves</h3>
+        <div class="mb-2">
+          <span class="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded-full"
+            >Annual Leave</span
+          >
+          <p class="text-sm">15/01/2024 - 19/01/2024</p>
         </div>
-  
-        <!-- Legend -->
-        <div class="bg-white rounded-lg p-4 shadow">
-          <h3 class="text-xl font-bold mb-2">Legend</h3>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="h-4 w-4 bg-blue-200 rounded inline-block"></span>
-            <span>Leave Days</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="h-4 w-4 bg-gray-200 rounded inline-block"></span>
-            <span>Available Days</span>
-          </div>
-        </div>
-  
-        <!-- Upcoming Leaves -->
-        <div class="bg-white rounded-lg p-4 shadow">
-          <h3 class="text-xl font-bold mb-3">Upcoming Leaves</h3>
-          <div class="mb-2">
-            <span class="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded-full">Annual Leave</span>
-            <p class="text-sm">15/01/2024 - 19/01/2024</p>
-          </div>
-          <div>
-            <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full">Sick Leave</span>
-            <p class="text-sm">05/02/2024 - 05/02/2024</p>
-          </div>
+        <div>
+          <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full"
+            >Sick Leave</span
+          >
+          <p class="text-sm">05/02/2024 - 05/02/2024</p>
         </div>
       </div>
     </div>
   </div>
-  
+</div>

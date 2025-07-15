@@ -1,25 +1,33 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CalendarA11y, CalendarModule, CalendarMonthViewComponent, CalendarUtils, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { CalendarEvent } from 'angular-calendar';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-calendar-leave',
-  imports: [DatePipe,CommonModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    DatePipe,
+    CalendarModule
+  ],
+
+  
   templateUrl: './calendar-leave.html',
-  styleUrl: './calendar-leave.css'
+  styleUrls: ['./calendar-leave.css']
 })
-export class CalendarLeave implements OnInit {
+export class CalendarLeave {
   currentMonth: Date = new Date();
   calendarDays: any[] = [];
   weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-  leaveDates = [
-    new Date('2024-01-15'),
-    new Date('2024-01-16'),
-    new Date('2024-01-17'),
-    new Date('2024-01-18'),
-    new Date('2024-01-19'),
-    new Date('2024-02-05'),
+  leaveDates: { date: Date; type: 'annual' | 'sick' }[] = [
+    { date: new Date('2025-07-10'), type: 'sick' },
+    { date: new Date('2025-07-15'), type: 'annual' },
   ];
+  
 
   ngOnInit() {
     this.generateCalendar();
@@ -30,31 +38,18 @@ export class CalendarLeave implements OnInit {
     const month = this.currentMonth.getMonth();
     const firstDay = new Date(year, month, 1);
     const startDay = firstDay.getDay();
-
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days: any[] = [];
 
-    // Fill previous month blanks
     for (let i = 0; i < startDay; i++) {
-      const d = new Date(year, month, i - startDay + 1);
-      days.push({ date: d, isOtherMonth: true });
+      days.push({ date: new Date(year, month, i - startDay + 1), isOtherMonth: true });
     }
 
-    // Current month
     for (let i = 1; i <= daysInMonth; i++) {
       days.push({ date: new Date(year, month, i), isOtherMonth: false });
     }
 
     this.calendarDays = days;
-  }
-
-  isLeaveDay(day: any): boolean {
-    return this.leaveDates.some(
-      (leave) =>
-        leave.getDate() === day.date.getDate() &&
-        leave.getMonth() === day.date.getMonth() &&
-        leave.getFullYear() === day.date.getFullYear()
-    );
   }
 
   isToday(date: Date): boolean {
@@ -64,6 +59,15 @@ export class CalendarLeave implements OnInit {
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear()
     );
+  }
+
+  getLeaveType(date: Date): 'annual' | 'sick' | null {
+    const match = this.leaveDates.find(l =>
+      l.date.getDate() === date.getDate() &&
+      l.date.getMonth() === date.getMonth() &&
+      l.date.getFullYear() === date.getFullYear()
+    );
+    return match?.type || null;
   }
 
   prevMonth() {

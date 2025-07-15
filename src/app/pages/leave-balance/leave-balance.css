@@ -1,0 +1,11 @@
+.dashboard {
+    margin: 20px;
+}
+.title {
+    font-weight: bold;
+    font-size: x-large;
+    color: rgb(30, 29, 29);
+}
+button :hover {
+    cursor: pointer;
+}

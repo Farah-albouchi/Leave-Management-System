@@ -1,0 +1,91 @@
+<div class="dashboard space-y-6">
+    <!-- Header -->
+    <div class="flex flex-row justify-between items-center">
+      <h1 class="title">Leave Balance</h1>
+      <!-- <button
+        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+      >
+        <fa-icon [icon]="faPlus"></fa-icon>
+        <span>Apply for Leave</span>
+      </button> -->
+    </div>
+  
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <app-card
+        title="Available Leave"
+        [value]="'18'"
+        subtitle="days remaining"
+        [icon]="faCalendar"
+        bgColor="bg-blue-100"
+        iconColor="text-blue-600"
+      ></app-card>
+  
+      <app-card
+        title="Used This Year"
+        [value]="'7'"
+        subtitle="days taken"
+        [icon]="faClock"
+        bgColor="bg-green-100"
+        iconColor="text-green-600"
+      ></app-card>
+  
+      <app-card
+        title="Pending Requests"
+        [value]="'1'"
+        subtitle="awaiting approval"
+        [icon]="faClipboard"
+        bgColor="bg-yellow-100"
+        iconColor="text-yellow-600"
+      ></app-card>
+  
+      <app-card
+        title="Approved Requests"
+        [value]="'3'"
+        subtitle="this year"
+        [icon]="faCheckCircle"
+        bgColor="bg-purple-100"
+        iconColor="text-purple-600"
+      ></app-card>
+    </div>
+  
+    <!-- Leave History Table -->
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-bold mb-4">Leave History</h2>
+      <div class="overflow-auto rounded-md">
+        <table class="w-full text-sm text-left text-gray-700">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+            <tr>
+              <th class="px-4 py-3">Type</th>
+              <th class="px-4 py-3">From</th>
+              <th class="px-4 py-3">To</th>
+              <th class="px-4 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let entry of leaveHistory"
+              class="bg-white border-b hover:bg-gray-50"
+            >
+              <td class="px-4 py-3">{{ entry.type }}</td>
+              <td class="px-4 py-3">{{ entry.from }}</td>
+              <td class="px-4 py-3">{{ entry.to }}</td>
+              <td class="px-4 py-3">
+                <span
+                  [ngClass]="{
+                    'text-green-600': entry.status === 'Approved',
+                    'text-red-600': entry.status === 'Rejected',
+                    'text-yellow-600': entry.status === 'Pending'
+                  }"
+                  class="font-medium"
+                >
+                  {{ entry.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
