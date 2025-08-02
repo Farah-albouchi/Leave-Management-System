@@ -1,75 +1,54 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCalendar as faCalendarRegular  } from '@fortawesome/free-regular-svg-icons';
 import {
   faHome,
+  faClipboard,
+  faCalendarCheck,
+  faCalendarAlt,
   faChartPie,
-  faTasks,
-  faCog,
-  faUser,
-  faLock,
-  faEnvelope,
-  faChevronDown,
-
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
 
-
-interface MenuItem {
-  icon: any;
-  label: string;
-  children?: MenuItem[];
-  isOpen?: boolean;
-}
-
 @Component({
-  standalone: true, 
+  standalone: true,
   selector: 'app-sidebar',
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.css'],
-  imports: [CommonModule, FontAwesomeModule,RouterModule]
+  imports: [CommonModule, FontAwesomeModule, RouterModule],
 })
 export class SidebarComponent {
   @Input() isSidebarCollapsed = false;
+  @Input() role: 'admin' | 'employee' = 'employee';
   @Output() sidebarToggle = new EventEmitter<void>();
 
   faCalendar = faCalendarRegular;
-  menuItems: MenuItem[] = [
-    {
-      icon: faHome,
-      label: 'Dashboard',
-      isOpen: false,
-      children: [
-        { icon: faChartPie, label: 'Analytics' },
-        { icon: faTasks, label: 'Projects' },
-      ]
-    },
-    {
-      icon: faCog,
-      label: 'Settings',
-      isOpen: false,
-      children: [
-        { icon: faUser, label: 'Profile' },
-        { icon: faLock, label: 'Security' },
-      ]
-    },
-    {
-      icon: faEnvelope,
-      label: 'Messages'
-    },
-   
-  ];
 
-  dropdownIcon = faChevronDown; 
+  menuItems: { label: string; path: string; icon: any }[] = [];
+
+  ngOnInit() {
+    if (this.role === 'admin') {
+      this.menuItems = [
+        { label: 'Dashboard', path: '/admin/dashboard', icon: faHome },
+        { label: 'Employees', path: '/admin/employees', icon: faUsers },
+        { label: 'Leave Requests', path: '/admin/leave-requests', icon: faClipboard },
+        { label: 'Holidays', path: '/admin/holidays', icon: faCalendarAlt },
+        { label: 'Statistics', path: '/admin/stats', icon: faChartPie },
+      ];
+    } else {
+      this.menuItems = [
+        { label: 'Dashboard', path: '/dashboard', icon: faHome },
+        { label: 'My Requests', path: '/myRequests', icon: faClipboard },
+        { label: 'Apply Leave', path: '/ApplyLeave', icon: faCalendarCheck },
+        { label: 'Calendar', path: '/CalendarLeave', icon: faCalendarAlt },
+        { label: 'Leave Balance', path: '/LeaveBalance', icon: faChartPie },
+      ];
+    }
+  }
 
   toggleSidebar() {
     this.sidebarToggle.emit();
-  }
-
-  toggleMenuItem(item: MenuItem) {
-    if (!this.isSidebarCollapsed && item.children) {
-      item.isOpen = !item.isOpen;
-    }
   }
 }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { faPlus, faCalendar, faClock, faClipboard, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { CommonModule } from '@angular/common';
-import { Card } from '../dashboard/card/card';
+import { Card } from '../../components/card/card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({

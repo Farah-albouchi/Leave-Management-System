@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Card } from './card/card';
+import { Card } from '../../components/card/card';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import {  faCalendar , faClock , faClipboard , faCheckCircle } from '@fortawesome/free-regular-svg-icons';
 import { RecentLeave } from './recent-leave/recent-leave';

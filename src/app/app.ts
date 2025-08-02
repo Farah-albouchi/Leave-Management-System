@@ -22,9 +22,10 @@ import { Dashboard } from './pages/dashboard/dashboard';
   styleUrls: ['./app.css']
 })
 export class App {
-  isSidebarCollapsed = false;
+  // isSidebarCollapsed = false;
+  // role: 'admin' | 'employee' = 'admin';
 
-  onSidebarToggle() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-  }
+  // onSidebarToggle() {
+  //   this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  // }
 }

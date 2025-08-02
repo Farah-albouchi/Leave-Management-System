@@ -1,0 +1,159 @@
+<div class="dashboard space-y-6">
+    <!-- Header + Action Buttons -->
+    <div class="flex flex-row justify-between items-center">
+      <h1 class="title">Admin Dashboard</h1>
+      <div class="flex gap-2">
+        <button
+          class="bg-white text-gray-800 border border-gray-300 px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-100"
+        >
+          <fa-icon [icon]="faCalendar"></fa-icon>
+          <span>View Calendar</span>
+        </button>
+        <button
+          class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+        >
+          <fa-icon [icon]="faChartLine"></fa-icon>
+          <span>Generate Report</span>
+        </button>
+      </div>
+    </div>
+  
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <app-card
+        title="Total Employees"
+        [value]="'63'"
+        subtitle="active members"
+        [icon]="faUsers"
+        bgColor="bg-blue-100"
+        iconColor="text-blue-600"
+      ></app-card>
+  
+      <app-card
+        title="Pending Requests"
+        [value]="'8'"
+        subtitle="need approval"
+        [icon]="faClock"
+        bgColor="bg-yellow-100"
+        iconColor="text-yellow-600"
+      ></app-card>
+  
+      <app-card
+        title="On Leave Today"
+        [value]="'6'"
+        subtitle="employees away"
+        [icon]="faCheckCircle"
+        bgColor="bg-green-100"
+        iconColor="text-green-600"
+      ></app-card>
+  
+      <app-card
+        title="Over Limit"
+        [value]="'2'"
+        subtitle="employees flagged"
+        [icon]="faExclamationTriangle"
+        bgColor="bg-red-100"
+        iconColor="text-red-600"
+      ></app-card>
+    </div>
+  
+    <!-- Pending Approval -->
+    <div  class="bg-white rounded-xl shadow-sm p-4 border border-blue-200">
+      <div class=" p-4 font-semibold text-lg flex justify-between">
+        <span class="text-lg font-semibold mb-4">Pending Approval</span>
+        <a href="#" class="text-sm text-blue-600">View all</a>
+      </div>
+  
+      <div >
+        <div class="p-4 flex justify-between items-center">
+          <div>
+            <div class="font-medium">Sarah Johnson <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Annual Leave</span></div>
+            <div class="text-sm text-gray-500">Jan 15–20, 2025 • 5 days</div>
+            <div class="text-xs text-gray-400">Submitted 2 hours ago</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="bg-green-600 text-white px-4 py-1 rounded hover:cursor-pointer">Approve</button>
+            <button class="bg-red-600 text-white px-4 py-1 rounded hover:cursor-pointer">Reject</button>
+          </div>
+        </div>
+  
+        <div class="p-4 flex justify-between items-center">
+          <div>
+            <div class="font-medium">Mike Chen <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Sick Leave</span></div>
+            <div class="text-sm text-gray-500">Jan 8, 2025 • 1 day</div>
+            <div class="text-xs text-gray-400">Submitted 1 day ago</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="bg-green-600 text-white px-4 py-1 rounded">Approve</button>
+            <button class="bg-red-600 text-white px-4 py-1 rounded">Reject</button>
+          </div>
+        </div>
+  
+        <div class="p-4 flex justify-between items-center">
+          <div>
+            <div class="font-medium">Emma Davis <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Personal Leave</span></div>
+            <div class="text-sm text-gray-500">Jan 22, 2025 • 1 day</div>
+            <div class="text-xs text-gray-400">Submitted 3 hours ago</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="bg-green-600 text-white px-4 py-1 rounded">Approve</button>
+            <button class="bg-red-600 text-white px-4 py-1 rounded">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="bg-white rounded-lg shadow">
+        <div class=" p-4 font-semibold text-lg">Team Overview</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
+          <div class="bg-gray-50 p-4 rounded shadow-sm">
+            <div class="flex justify-between items-center">
+              <div class="font-bold text-lg">Engineering</div>
+              <div class="text-sm text-gray-500">25 total</div>
+            </div>
+            <div class="text-sm mt-2">
+              <span class="text-green-600 font-medium">● On Leave: 3</span>
+              &nbsp;&nbsp;
+              <span class="text-yellow-600 font-medium">● Pending: 2</span>
+            </div>
+          </div>
+    
+          <div class="bg-gray-50 p-4 rounded shadow-sm">
+            <div class="flex justify-between items-center">
+              <div class="font-bold text-lg">Marketing</div>
+              <div class="text-sm text-gray-500">12 total</div>
+            </div>
+            <div class="text-sm mt-2">
+              <span class="text-green-600 font-medium">● On Leave: 1</span>
+              &nbsp;&nbsp;
+              <span class="text-yellow-600 font-medium">● Pending: 1</span>
+            </div>
+          </div>
+    
+          <div class="bg-gray-50 p-4 rounded shadow-sm">
+            <div class="flex justify-between items-center">
+              <div class="font-bold text-lg">Sales</div>
+              <div class="text-sm text-gray-500">18 total</div>
+            </div>
+            <div class="text-sm mt-2">
+              <span class="text-green-600 font-medium">● On Leave: 2</span>
+              &nbsp;&nbsp;
+              <span class="text-yellow-600 font-medium">● Pending: 0</span>
+            </div>
+          </div>
+    
+          <div class="bg-gray-50 p-4 rounded shadow-sm">
+            <div class="flex justify-between items-center">
+              <div class="font-bold text-lg">HR</div>
+              <div class="text-sm text-gray-500">8 total</div>
+            </div>
+            <div class="text-sm mt-2">
+              <span class="text-green-600 font-medium">● On Leave: 0</span>
+              &nbsp;&nbsp;
+              <span class="text-yellow-600 font-medium">● Pending: 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  

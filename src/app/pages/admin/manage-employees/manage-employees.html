@@ -1,0 +1,211 @@
+<div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Manage Employees</h2>
+  
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <!-- Search input -->
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search by name or email"
+          class="border border-gray-300 rounded-md px-4 py-2 w-full md:w-1/3 focus:outline-none focus:ring focus:ring-blue-200"
+        />
+  
+        <!-- Filters -->
+        <div class="flex flex-col md:flex-row gap-3">
+          <select
+            [(ngModel)]="filterRole"
+            class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200"
+          >
+            <option value="">All Roles</option>
+            <option value="Employee">Employee</option>
+            <option value="Manager">Manager</option>
+          </select>
+  
+          <select
+            [(ngModel)]="filterStatus"
+            class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200"
+          >
+            <option value="">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+  
+        <button
+        (click)="openAddModal()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md shadow-md"
+      >
+        + Add Employee
+      </button>
+      
+      </div>
+  
+      <!-- Table -->
+      <div class="overflow-x-auto rounded-xl border border-gray-200">
+        <table class="min-w-full bg-white">
+          <thead class="bg-gray-50 text-left">
+            <tr class="text-gray-600 text-sm">
+              <th class="px-6 py-3 font-semibold">Name</th>
+              <th class="px-6 py-3 font-semibold">Email</th>
+              <th class="px-6 py-3 font-semibold">Department</th>
+              <th class="px-6 py-3 font-semibold">Role</th>
+              <th class="px-6 py-3 font-semibold">Status</th>
+              <th class="px-6 py-3 font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of filteredEmployees()" class="hover:bg-gray-50 border-b">
+              <td class="px-6 py-3 font-medium text-gray-800">{{ emp.name }}</td>
+              <td class="px-6 py-3">{{ emp.email }}</td>
+              <td class="px-6 py-3">{{ emp.department }}</td>
+              <td class="px-6 py-3">{{ emp.role }}</td>
+              <td class="px-6 py-3">
+                <span
+                  class="px-3 py-1 rounded-full text-sm font-semibold"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': emp.status === 'Active',
+                    'bg-yellow-100 text-yellow-800': emp.status === 'Pending'
+                  }"
+                >
+                  {{ emp.status }}
+                </span>
+              </td>
+              <td class="px-6 py-3 text-sm">
+                <a
+                  [routerLink]="['/admin/employees', emp.id]"
+                  class="text-blue-600 hover:text-blue-800"
+                  title="View Profile"
+                >
+                  <fa-icon [icon]="faEye"></fa-icon>
+                </a>
+              </td>
+              
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Add Employee Modal -->
+<div
+*ngIf="showAddModal"
+class="fixed inset-0 z-50 backdrop-blur-sm bg-white/30 flex items-center justify-center"
+>
+<div class="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 space-y-6 relative">
+  <h3 class="text-xl font-bold text-gray-800">Add New Employee</h3>
+
+  <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- First Name -->
+    <div>
+      <label class="block text-sm text-gray-600">First Name</label>
+      <input
+        type="text"
+        [(ngModel)]="newEmployee.firstName"
+        name="firstName"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+    </div>
+
+    <!-- Last Name -->
+    <div>
+      <label class="block text-sm text-gray-600">Last Name</label>
+      <input
+        type="text"
+        [(ngModel)]="newEmployee.lastName"
+        name="lastName"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label class="block text-sm text-gray-600">Email</label>
+      <input
+        type="email"
+        [(ngModel)]="newEmployee.email"
+        name="email"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+    </div>
+
+    <!-- Phone -->
+    <div>
+      <label class="block text-sm text-gray-600">Phone</label>
+      <input
+        type="text"
+        [(ngModel)]="newEmployee.phone"
+        name="phone"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+    </div>
+
+    <!-- CIN -->
+    <div>
+      <label class="block text-sm text-gray-600">CIN</label>
+      <input
+        type="number"
+        [(ngModel)]="newEmployee.cin"
+        name="cin"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+    </div>
+
+    <!-- Address -->
+    <div>
+      <label class="block text-sm text-gray-600">Address</label>
+      <input
+        type="text"
+        [(ngModel)]="newEmployee.address"
+        name="address"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+    </div>
+
+    <!-- Role -->
+    <div>
+      <label class="block text-sm text-gray-600">Role</label>
+      <select
+        [(ngModel)]="newEmployee.role"
+        name="role"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      >
+        <option value="EMPLOYEE">Employee</option>
+        <option value="ADMIN">Admin</option>
+      </select>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <label class="block text-sm text-gray-600">Status</label>
+      <select
+        [(ngModel)]="newEmployee.status"
+        name="status"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      >
+        <option value="Active">Active</option>
+        <option value="Pending">Pending</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Buttons -->
+  <div class="flex justify-end gap-4 pt-4">
+    <button
+      class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+      (click)="closeAddModal()"
+    >
+      Cancel
+    </button>
+    <button
+      class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      (click)="addEmployee()"
+    >
+      Add Employee
+    </button>
+  </div>
+</div>
+</div>
+
+  </div>
+  
