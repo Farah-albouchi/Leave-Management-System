@@ -7,20 +7,58 @@
       </p>
     </div>
     <button
-      class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+      (click)="navigateToApplyLeave()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700 transition"
     >
       <fa-icon [icon]="faPlus"></fa-icon>
       <span>Apply for Leave</span>
     </button>
   </div>
 
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      </div>
+      <button 
+        (click)="errorMessage = ''"
+        class="text-red-600 hover:text-red-800"
+      >
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
   <div class="bg-white rounded-lg p-4 m-2 shadow-sm">
-    <h3 class="text-2xl font-semibold mb-4">Request History</h3>
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-2xl font-semibold">Request History</h3>
+      
+      <div class="flex items-center space-x-2">
+        <!-- Refresh Button -->
+        <button 
+          (click)="refreshRequests()"
+          [disabled]="isLoading"
+          class="flex items-center gap-2 px-3 py-1 border border-gray-300 rounded-md bg-white shadow-sm hover:bg-gray-50 transition"
+        >
+          <fa-icon 
+            [icon]="faRefresh" 
+            [class.animate-spin]="isLoading"
+            class="w-4 h-4 text-gray-600"
+          ></fa-icon>
+          <span class="text-sm text-gray-700">Refresh</span>
+        </button>
+      </div>
+    </div>
 
     <div class="flex justify-end items-center mb-4 gap-2">
-      <div
-        class="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1 bg-white shadow-sm"
-      >
+      <!-- Status Filter -->
+      <div class="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1 bg-white shadow-sm">
         <svg
           width="18px"
           height="18px"
@@ -46,12 +84,14 @@
         </svg>
 
         <select
+          (change)="onStatusFilterChange($event)"
+          [value]="selectedStatus"
           class="appearance-none bg-transparent focus:outline-none text-sm text-gray-700"
         >
-          <option>All Status</option>
-          <option>Approved</option>
-          <option>Pending</option>
-          <option>Rejected</option>
+          <option value="all">All Status</option>
+          <option value="accepted">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
         </select>
 
         <svg
@@ -70,9 +110,8 @@
         </svg>
       </div>
 
-      <div
-        class="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1 bg-white shadow-sm"
-      >
+      <!-- Export Button -->
+      <div class="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1 bg-white shadow-sm">
         <svg
           width="18px"
           height="18px"
@@ -103,84 +142,136 @@
             ></path>
           </g>
         </svg>
-        <button class="text-gray-700 text-sm">Export</button>
+        <button 
+          (click)="exportRequests()"
+          class="text-gray-700 text-sm hover:text-gray-900 transition"
+        >
+          Export
+        </button>
       </div>
     </div>
 
-    <table class="w-full text-left text-sm">
-      <thead class="text-gray-600 border-b border-gray-300">
-        <tr>
-          <th class="py-2">Type</th>
-          <th class="py-2">Start Date</th>
-          <th class="py-2">End Date</th>
-          <th class="py-2">Days</th>
-          <th class="py-2">Status</th>
-          <th class="py-2">Submitted</th>
-          <th class="py-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let request of leaveRequests"
-          class="border-b hover:bg-gray-50 transition border-gray-300"
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+      <div class="flex items-center space-x-2">
+        <fa-icon [icon]="faSpinner" class="animate-spin text-blue-600"></fa-icon>
+        <span class="text-gray-600">Loading your requests...</span>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredRequests.length === 0 && !errorMessage" class="text-center py-12">
+      <div class="flex flex-col items-center space-y-4">
+        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <div>
+          <h3 class="text-lg font-medium text-gray-900">No leave requests found</h3>
+          <p class="text-gray-500">
+            {{ selectedStatus === 'all' ? "You haven't submitted any leave requests yet." : "No requests found with the selected status." }}
+          </p>
+        </div>
+        <button
+          *ngIf="selectedStatus === 'all'"
+          (click)="navigateToApplyLeave()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
         >
-          <td class="py-5 font-medium">{{ request.type }}</td>
-          <td class="py-5">{{ request.startDate }}</td>
-          <td class="py-5">{{ request.endDate }}</td>
-          <td class="py-5">{{ request.days }}</td>
-          <td class="py-5">
-            <span
-              [ngClass]="{
-                'bg-green-100 text-green-700': request.status === 'Approved',
-                'bg-yellow-100 text-yellow-700': request.status === 'Pending',
-                'bg-red-100 text-red-700': request.status === 'Rejected'
-              }"
-              class="px-2 py-1 text-xs font-medium rounded-full"
-              >{{ request.status }}</span
-            >
-          </td>
-          <td class="py-2">{{ request.submitted }}</td>
-          <td class="py-2">
-            <svg
-            (click)="openModal(request)"
-            class="cursor-pointer text-gray-600 hover:text-black"
-              width="20px"
-              height="20px"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-              <g
-                id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></g>
-              <g id="SVGRepo_iconCarrier">
-                <path
-                  d="M3.27489 15.2957C2.42496 14.1915 2 13.6394 2 12C2 10.3606 2.42496 9.80853 3.27489 8.70433C4.97196 6.49956 7.81811 4 12 4C16.1819 4 19.028 6.49956 20.7251 8.70433C21.575 9.80853 22 10.3606 22 12C22 13.6394 21.575 14.1915 20.7251 15.2957C19.028 17.5004 16.1819 20 12 20C7.81811 20 4.97196 17.5004 3.27489 15.2957Z"
-                  stroke="#1C274C"
-                  stroke-width="1.5"
-                ></path>
-                <path
-                  d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
-                  stroke="#1C274C"
-                  stroke-width="1.5"
-                ></path>
-              </g>
-            </svg>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          Submit Your First Request
+        </button>
+      </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div *ngIf="!isLoading && filteredRequests.length > 0" class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="text-gray-600 border-b border-gray-300">
+          <tr>
+            <th class="py-2">Type</th>
+            <th class="py-2">Start Date</th>
+            <th class="py-2">End Date</th>
+            <th class="py-2">Days</th>
+            <th class="py-2">Status</th>
+            <th class="py-2">Submitted</th>
+            <th class="py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let request of filteredRequests"
+            class="border-b hover:bg-gray-50 transition border-gray-300"
+          >
+            <td class="py-5 font-medium">{{ request.type }}</td>
+            <td class="py-5">{{ formatDate(request.startDate) }}</td>
+            <td class="py-5">{{ formatDate(request.endDate) }}</td>
+            <td class="py-5">
+              {{ calculateWorkingDays(request.startDate, request.endDate, request.halfDay) }}
+              <span *ngIf="request.halfDay" class="text-xs text-gray-500">(half day)</span>
+            </td>
+            <td class="py-5">
+              <span
+                [ngClass]="getStatusBadgeClass(request.status)"
+                class="px-2 py-1 text-xs font-medium rounded-full"
+              >
+                {{ request.status === 'ACCEPTED' ? 'Approved' : 
+                   request.status === 'PENDING' ? 'Pending' : 
+                   request.status === 'REJECTED' ? 'Rejected' : request.status }}
+              </span>
+            </td>
+            <td class="py-2">{{ request.createdAt ? formatDate(request.createdAt) : 'N/A' }}</td>
+            <td class="py-2">
+              <div class="flex items-center space-x-2">
+                <svg
+                  (click)="openModal(request)"
+                  class="cursor-pointer text-gray-600 hover:text-black transition"
+                  width="20px"
+                  height="20px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  title="View Details"
+                >
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g
+                    id="SVGRepo_tracerCarrier"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></g>
+                  <g id="SVGRepo_iconCarrier">
+                    <path
+                      d="M3.27489 15.2957C2.42496 14.1915 2 13.6394 2 12C2 10.3606 2.42496 9.80853 3.27489 8.70433C4.97196 6.49956 7.81811 4 12 4C16.1819 4 19.028 6.49956 20.7251 8.70433C21.575 9.80853 22 10.3606 22 12C22 13.6394 21.575 14.1915 20.7251 15.2957C19.028 17.5004 16.1819 20 12 20C7.81811 20 4.97196 17.5004 3.27489 15.2957Z"
+                      stroke="#1C274C"
+                      stroke-width="1.5"
+                    ></path>
+                    <path
+                      d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
+                      stroke="#1C274C"
+                      stroke-width="1.5"
+                    ></path>
+                  </g>
+                </svg>
+
+                <!-- Cancel Button for Pending Requests -->
+                <button
+                  *ngIf="canCancelRequest(request)"
+                  (click)="openModal(request)"
+                  class="text-red-600 hover:text-red-800 transition text-xs px-2 py-1 border border-red-300 rounded"
+                  title="Cancel Request"
+                >
+                  Cancel
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Request Details Modal -->
     <app-request-details
-  *ngIf="showModal"
-  [request]="selectedRequest"
-  (close)="closeModal()"
-  (cancel)="handleCancelRequest()"
-></app-request-details>
-
-  
-
+      *ngIf="showModal && selectedRequest"
+      [request]="selectedRequest"
+      (close)="closeModal()"
+      (cancel)="handleCancelRequest()"
+    ></app-request-details>
   </div>
 </div>

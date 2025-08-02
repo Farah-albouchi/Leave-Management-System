@@ -158,4 +158,17 @@ export class AuthService {
     const payload = this.getTokenPayload();
     return payload?.sub || null;
   }
+
+  // Debug method - remove after testing
+  debugToken(): void {
+    const token = this.getToken();
+    console.log('🔍 Auth Debug Info:', {
+      hasToken: !!token,
+      tokenLength: token?.length,
+      isExpired: token ? this.isTokenExpired(token) : 'no token',
+      payload: this.getTokenPayload(),
+      isAuthenticated: this.isAuthenticated(),
+      currentUser: this.getCurrentUser()
+    });
+  }
 }
