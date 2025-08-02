@@ -13,6 +13,8 @@ import { CalendarLeave } from './pages/calendar-leave/calendar-leave';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { LeaveBalance } from './pages/leave-balance/leave-balance';
 import { MyRequests } from './pages/my-requests/my-requests';
+import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: 'login', component: Login }, // ❌ NO LAYOUT
@@ -20,15 +22,43 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: Dashboard },
-      { path: 'myRequests', component: MyRequests },
-      { path: 'ApplyLeave', component: ApplyLeave },
-      { path: 'CalendarLeave', component: CalendarLeave },
-      { path: 'LeaveBalance', component: LeaveBalance },
+      { 
+        path: 'dashboard', 
+        component: Dashboard,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
+      { 
+        path: 'myRequests', 
+        component: MyRequests,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
+      { 
+        path: 'ApplyLeave', 
+        component: ApplyLeave,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
+      { 
+        path: 'CalendarLeave', 
+        component: CalendarLeave,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
+      { 
+        path: 'LeaveBalance', 
+        component: LeaveBalance,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
       {
         path: 'admin',
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'ADMIN' },
         children: [
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
           { path: 'dashboard', component: DashboardAdmin },
@@ -41,4 +71,7 @@ export const routes: Routes = [
       },
     ],
   },
+  
+  // Catch all route - redirect to login if not authenticated, otherwise to dashboard
+  { path: '**', redirectTo: 'login' }
 ];

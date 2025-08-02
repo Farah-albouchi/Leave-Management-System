@@ -92,17 +92,27 @@
           </button>
         </div>
   
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-sm text-red-600">{{ errorMessage }}</p>
+        </div>
+
         <!-- Login Form -->
-        <form class="space-y-5">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
           <div>
             <label class="text-sm font-medium block mb-1">Email Address</label>
             <div class="relative">
               <fa-icon [icon]="faEnvelope" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></fa-icon>
               <input
                 type="email"
+                formControlName="email"
                 placeholder="Enter your email"
-                class="pl-10 w-full h-12 rounded-lg border border-gray-300 bg-gray-50 focus:border-blue-500 outline-none"
+                [class]="'pl-10 w-full h-12 rounded-lg border bg-gray-50 focus:border-blue-500 outline-none ' + 
+                         (isFieldInvalid('email') ? 'border-red-300 focus:border-red-500' : 'border-gray-300')"
               />
+            </div>
+            <div *ngIf="isFieldInvalid('email')" class="mt-1 text-xs text-red-600">
+              {{ getFieldError('email') }}
             </div>
           </div>
   
@@ -112,8 +122,10 @@
               <fa-icon [icon]="faLock" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></fa-icon>
               <input
                 [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
                 placeholder="Enter your password"
-                class="pl-10 pr-10 w-full h-12 rounded-lg border border-gray-300 bg-gray-50 focus:border-blue-500 outline-none"
+                [class]="'pl-10 pr-10 w-full h-12 rounded-lg border bg-gray-50 focus:border-blue-500 outline-none ' + 
+                         (isFieldInvalid('password') ? 'border-red-300 focus:border-red-500' : 'border-gray-300')"
               />
               <button
                 type="button"
@@ -122,11 +134,18 @@
                 <fa-icon [icon]="showPassword ? faEyeSlash : faEye" class="w-4 h-4"></fa-icon>
               </button>
             </div>
+            <div *ngIf="isFieldInvalid('password')" class="mt-1 text-xs text-red-600">
+              {{ getFieldError('password') }}
+            </div>
           </div>
   
           <div class="flex justify-between items-center text-sm">
             <label class="flex items-center gap-2">
-              <input type="checkbox" class="w-4 h-4 rounded border-gray-300" />
+              <input 
+                type="checkbox" 
+                formControlName="rememberMe"
+                class="w-4 h-4 rounded border-gray-300" 
+              />
               Remember me
             </label>
             <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
@@ -134,8 +153,17 @@
   
           <button
             type="submit"
-            class="w-full h-12 bg-blue-600 hover:bg-blue-700 transition rounded-lg text-white font-semibold shadow-md">
-            Sign In as {{ userType === 'employee' ? 'Employee' : 'Administrator' }}
+            [disabled]="isLoading"
+            [class]="'w-full h-12 transition rounded-lg text-white font-semibold shadow-md flex items-center justify-center gap-2 ' +
+                     (isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700')">
+            <fa-icon 
+              *ngIf="isLoading" 
+              [icon]="faSpinner" 
+              class="w-4 h-4 animate-spin">
+            </fa-icon>
+            <span>
+              {{ isLoading ? 'Signing in...' : 'Sign In as ' + (userType === 'employee' ? 'Employee' : 'Administrator') }}
+            </span>
           </button>
   
           <p class="text-center text-xs text-gray-400 mt-6">
