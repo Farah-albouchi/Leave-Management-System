@@ -32,10 +32,10 @@ export class SidebarComponent {
     if (this.role === 'admin') {
       this.menuItems = [
         { label: 'Dashboard', path: '/admin/dashboard', icon: faHome },
-        { label: 'Employees', path: '/admin/employees', icon: faUsers },
-        { label: 'Leave Requests', path: '/admin/leave-requests', icon: faClipboard },
+        { label: 'Employees', path: '/admin/manage-employees', icon: faUsers },
+        { label: 'Leave Requests', path: '/admin/manage-requests', icon: faClipboard },
         { label: 'Holidays', path: '/admin/holidays', icon: faCalendarAlt },
-        { label: 'Statistics', path: '/admin/stats', icon: faChartPie },
+        { label: 'Statistics', path: '/admin/statistics', icon: faChartPie },
       ];
     } else {
       this.menuItems = [
