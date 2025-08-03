@@ -5,7 +5,8 @@ import { map, catchError } from 'rxjs/operators';
 import { 
   LeaveRequestCreateDto, 
   LeaveRequestResponseDto, 
-  ApiResponse 
+  ApiResponse,
+  LeaveStatus 
 } from '../models/leave-request.models';
 
 @Injectable({
@@ -53,6 +54,38 @@ export class LeaveRequestService {
       .pipe(
         catchError(error => {
           console.error('Error fetching leave requests:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
+
+  /**
+   * Get all requests for admin
+   */
+  getAllRequestsForAdmin(): Observable<LeaveRequestResponseDto[]> {
+    return this.http.get<LeaveRequestResponseDto[]>('http://localhost:8080/api/admin/requests')
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching admin requests:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
+
+  /**
+   * Update request status (for admin)
+   */
+  updateRequestStatus(requestId: string, status: LeaveStatus, reason?: string): Observable<any> {
+    const url = status === LeaveStatus.ACCEPTED 
+      ? `http://localhost:8080/api/admin/requests/${requestId}/approve`
+      : `http://localhost:8080/api/admin/requests/${requestId}/reject`;
+    
+    const body = reason ? { reason } : {};
+    
+    return this.http.put(url, body)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating request status:', error);
           return throwError(() => this.handleError(error));
         })
       );

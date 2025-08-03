@@ -65,18 +65,18 @@
       bgColor="bg-blue-100"
       iconColor="text-blue-600"
       [clickable]="true"
-      (cardClick)="navigateToManageEmployees()"
+      (cardClick)="navigateToEmployees()"
     ></app-card>
 
     <app-card
       title="Pending Requests"
-      [value]="adminStats.pendingRequests.toString()"
+      [value]="getPendingCount().toString()"
       subtitle="need approval"
       [icon]="faClock"
       bgColor="bg-yellow-100"
       iconColor="text-yellow-600"
       [clickable]="true"
-      (cardClick)="navigateToManageRequests()"
+      (cardClick)="navigateToPendingRequests()"
     ></app-card>
 
     <app-card
@@ -87,7 +87,7 @@
       bgColor="bg-green-100"
       iconColor="text-green-600"
       [clickable]="true"
-      (cardClick)="navigateToManageEmployees()"
+      (cardClick)="navigateToEmployees()"
     ></app-card>
 
     <app-card
@@ -98,164 +98,173 @@
       bgColor="bg-red-100"
       iconColor="text-red-600"
       [clickable]="true"
-      (cardClick)="navigateToManageEmployees()"
+      (cardClick)="navigateToEmployees()"
     ></app-card>
   </div>
 
-  <!-- Pending Approval -->
-  <div class="bg-white rounded-xl shadow-sm p-4 border border-blue-200">
-    <div class="flex justify-between items-center p-4">
-      <h2 class="text-lg font-semibold">Pending Approval</h2>
-      <button 
-        (click)="navigateToManageRequests()"
-        class="text-sm text-blue-600 hover:text-blue-800"
-      >
-        View all
-      </button>
-    </div>
-
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="space-y-4">
-      <div *ngFor="let i of [1,2,3]" class="p-4 flex justify-between items-center animate-pulse">
-        <div class="space-y-2">
-          <div class="h-4 bg-gray-200 rounded w-48"></div>
-          <div class="h-3 bg-gray-200 rounded w-32"></div>
-          <div class="h-3 bg-gray-200 rounded w-24"></div>
+  <!-- Two Column Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    
+    <!-- Pending Requests -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-semibold">Pending Requests ({{ getPendingCount() }})</h3>
+        <button 
+          (click)="navigateToPendingRequests()"
+          class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+          View all
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <!-- Loading state -->
+        <div *ngIf="isLoading" class="space-y-4">
+          <div *ngFor="let i of [1,2,3]" class="animate-pulse">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <div class="h-8 bg-gray-200 rounded w-16"></div>
-          <div class="h-8 bg-gray-200 rounded w-16"></div>
+
+        <!-- Pending Request Items -->
+        <div 
+          *ngFor="let request of pendingRequests" 
+          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  {{ getEmployeeInitials(request.employeeName || '') }}
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-900">{{ request.employeeName || 'Unknown Employee' }}</h4>
+                  <span 
+                    class="px-2 py-1 text-xs font-medium rounded-full"
+                    [ngClass]="getStatusBadgeClass(request.status)"
+                  >
+                    {{ request.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600 space-y-1">
+              <div><strong>Type:</strong> {{ request.type }}</div>
+              <div><strong>Period:</strong> {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}</div>
+              <div><strong>Duration:</strong> {{ calculateDaysText(request) }}</div>
+              <div *ngIf="request.reason"><strong>Reason:</strong> {{ request.reason }}</div>
+            </div>
+          </div>
+          
+          <div class="flex flex-col gap-2 ml-4">
+            <button 
+              (click)="quickApproveRequest(request)"
+              class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition"
+            >
+              Approve
+            </button>
+            <button 
+              (click)="quickRejectRequest(request)"
+              class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition"
+            >
+              Reject
+            </button>
+            <button 
+              (click)="viewRequestDetails(request)"
+              class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition"
+            >
+              View
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoading && pendingRequests.length === 0" class="text-center py-6">
+          <div class="flex flex-col items-center space-y-2">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-sm text-gray-500">No pending requests</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!isLoading && pendingRequests.length === 0" class="text-center py-8">
-      <div class="flex flex-col items-center space-y-3">
-        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        <div>
-          <h3 class="text-sm font-medium text-gray-900">No pending requests</h3>
-          <p class="text-sm text-gray-500">All leave requests have been processed.</p>
-        </div>
+    <!-- Recent Requests -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-semibold">Recent Leave Requests</h3>
+        <button 
+          (click)="navigateToAllRequests()"
+          class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+          View all
+        </button>
       </div>
-    </div>
+      
+      <div class="space-y-3">
+        <!-- Loading state -->
+        <div *ngIf="isLoading" class="space-y-3">
+          <div *ngFor="let i of [1,2,3,4]" class="animate-pulse">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Pending Requests List -->
-    <div *ngIf="!isLoading && pendingRequests.length > 0" class="space-y-1">
-      <div 
-        *ngFor="let request of pendingRequests.slice(0, 5)" 
-        class="p-4 flex justify-between items-center hover:bg-gray-50 rounded-lg transition-colors"
-      >
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="font-medium">{{ request.employeeName || 'Employee' }}</span>
+        <!-- Recent Request Items -->
+        <div 
+          *ngFor="let request of recentRequests" 
+          class="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+              {{ getEmployeeInitials(request.employeeName || '') }}
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-900">{{ request.employeeName || 'Unknown' }}</div>
+              <div class="text-xs text-gray-500">
+                {{ request.type }} • {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center space-x-2">
             <span 
-              class="text-xs font-semibold px-2 py-0.5 rounded"
+              class="px-2 py-1 text-xs font-medium rounded-full"
               [ngClass]="getStatusBadgeClass(request.status)"
             >
-              {{ request.type }}
+              {{ request.status }}
             </span>
-          </div>
-          <div class="text-sm text-gray-500">
-            {{ formatDate(request.startDate) }}
-            <span *ngIf="request.startDate !== request.endDate">
-              – {{ formatDate(request.endDate) }}
-            </span>
-            • 
-            {{ calculateDaysText(request) }}
-          </div>
-          <div class="text-xs text-gray-400">
-            Submitted {{ formatDate(request.startDate) }}
+            <button 
+              (click)="viewRequestDetails(request)"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
           </div>
         </div>
-        <div class="flex gap-2">
-          <button 
-            (click)="approveRequest(request.id)"
-            class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition text-sm"
-          >
-            Approve
-          </button>
-          <button 
-            (click)="rejectRequest(request.id)"
-            class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 transition text-sm"
-          >
-            Reject
-          </button>
-          <button 
-            (click)="viewRequestDetails(request.id)"
-            class="text-blue-600 hover:text-blue-800 px-2 py-1 text-sm"
-            title="View Details"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoading && recentRequests.length === 0" class="text-center py-6">
+          <div class="flex flex-col items-center space-y-2">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
-          </button>
+            <p class="text-sm text-gray-500">No recent requests</p>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="bg-white rounded-lg shadow p-6">
-    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <button 
-        (click)="navigateToManageRequests()"
-        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-      >
-        <fa-icon [icon]="faClipboard" class="text-blue-600 text-xl mb-2"></fa-icon>
-        <span class="text-sm font-medium">Manage Requests</span>
-      </button>
-      
-      <button 
-        (click)="navigateToManageEmployees()"
-        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-      >
-        <fa-icon [icon]="faUsers" class="text-green-600 text-xl mb-2"></fa-icon>
-        <span class="text-sm font-medium">Manage Employees</span>
-      </button>
-      
-      <button 
-        (click)="navigateToStatistics()"
-        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-      >
-        <fa-icon [icon]="faChartLine" class="text-purple-600 text-xl mb-2"></fa-icon>
-        <span class="text-sm font-medium">View Statistics</span>
-      </button>
-      
-      <button 
-        (click)="navigateToHolidays()"
-        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-      >
-        <fa-icon [icon]="faCalendar" class="text-orange-600 text-xl mb-2"></fa-icon>
-        <span class="text-sm font-medium">Holiday Calendar</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Recent Activity Summary -->
-  <div class="bg-white rounded-lg shadow p-6" *ngIf="!isLoading">
-    <h3 class="text-lg font-semibold mb-4">Today's Summary</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-      <div class="bg-blue-50 p-4 rounded-lg">
-        <div class="text-blue-600 font-semibold">Total Requests</div>
-        <div class="text-2xl font-bold text-blue-800">{{ recentRequests.length }}</div>
-        <div class="text-blue-600">This month</div>
-      </div>
-      
-      <div class="bg-yellow-50 p-4 rounded-lg">
-        <div class="text-yellow-600 font-semibold">Pending Review</div>
-        <div class="text-2xl font-bold text-yellow-800">{{ pendingRequests.length }}</div>
-        <div class="text-yellow-600">Awaiting approval</div>
-      </div>
-      
-      <div class="bg-green-50 p-4 rounded-lg">
-        <div class="text-green-600 font-semibold">Employees Away</div>
-        <div class="text-2xl font-bold text-green-800">{{ adminStats.onLeaveToday }}</div>
-        <div class="text-green-600">Currently on leave</div>
       </div>
     </div>
   </div>

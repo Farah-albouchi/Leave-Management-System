@@ -79,16 +79,23 @@ export class DashboardAdmin implements OnInit, OnDestroy {
   }
 
   private loadPendingRequests(): void {
-    // For now, we'll use the regular leave request service
-    // In a real implementation, this would be an admin-specific endpoint
-    this.leaveRequestService.getMyRequests()
+    // Load all admin requests and filter for pending
+    this.leaveRequestService.getAllRequestsForAdmin()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (requests) => {
-          this.pendingRequests = requests.filter(req => req.status === LeaveStatus.PENDING);
+          this.pendingRequests = requests
+            .filter(req => req.status === LeaveStatus.PENDING)
+            .slice(0, 5); // Show only top 5 pending
+          
           this.recentRequests = requests
-            .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
-            .slice(0, 5);
+            .sort((a, b) => {
+              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+              return dateB - dateA;
+            })
+            .slice(0, 8); // Show recent 8 requests
+          
           this.isLoading = false;
         },
         error: (error) => {
@@ -99,40 +106,67 @@ export class DashboardAdmin implements OnInit, OnDestroy {
       });
   }
 
-  navigateToManageRequests(): void {
-    this.router.navigate(['/admin/leave-requests']);
+  // Navigation methods
+  navigateToPendingRequests(): void {
+    this.router.navigate(['/admin/manage-requests']);
   }
 
-  navigateToManageEmployees(): void {
-    this.router.navigate(['/admin/employees']);
+  navigateToEmployees(): void {
+    this.router.navigate(['/admin/manage-employees']);
   }
 
   navigateToStatistics(): void {
-    this.router.navigate(['/admin/stats']);
+    this.router.navigate(['/admin/statistics']);
   }
 
   navigateToHolidays(): void {
     this.router.navigate(['/admin/holidays']);
   }
 
-  approveRequest(requestId: string): void {
-    // This would call an admin service to approve the request
-    console.log('Approving request:', requestId);
-    // For now, just refresh the data
-    this.loadPendingRequests();
+  navigateToAllRequests(): void {
+    this.router.navigate(['/admin/manage-requests']);
   }
 
-  rejectRequest(requestId: string): void {
-    // This would call an admin service to reject the request
-    console.log('Rejecting request:', requestId);
-    // For now, just refresh the data
-    this.loadPendingRequests();
+  // Quick actions from dashboard
+  quickApproveRequest(request: LeaveRequestResponseDto): void {
+    if (!confirm(`Are you sure you want to approve ${request.employeeName || 'this employee'}'s leave request?`)) {
+      return;
+    }
+
+    this.leaveRequestService.updateRequestStatus(request.id, LeaveStatus.ACCEPTED)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Request approved successfully');
+          this.refreshDashboard();
+        },
+        error: (error) => {
+          console.error('Error approving request:', error);
+          this.errorMessage = 'Failed to approve request';
+        }
+      });
   }
 
-  viewRequestDetails(requestId: string): void {
-    this.router.navigate(['/admin/leave-requests'], { 
-      queryParams: { requestId } 
-    });
+  quickRejectRequest(request: LeaveRequestResponseDto): void {
+    const reason = prompt('Please provide a reason for rejection:');
+    if (!reason) return;
+
+    this.leaveRequestService.updateRequestStatus(request.id, LeaveStatus.REJECTED, reason)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Request rejected successfully');
+          this.refreshDashboard();
+        },
+        error: (error) => {
+          console.error('Error rejecting request:', error);
+          this.errorMessage = 'Failed to reject request';
+        }
+      });
+  }
+
+  viewRequestDetails(request: LeaveRequestResponseDto): void {
+    this.router.navigate(['/admin/manage-requests']);
   }
 
   formatDate(dateString: string): string {
@@ -177,5 +211,19 @@ export class DashboardAdmin implements OnInit, OnDestroy {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     
     return `${diffDays} days`;
+  }
+
+  getEmployeeInitials(employeeName: string): string {
+    if (!employeeName) return '?';
+    
+    return employeeName
+      .split(' ')
+      .filter(name => name.length > 0)
+      .map(name => name.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  getPendingCount(): number {
+    return this.pendingRequests.length;
   }
 }

@@ -1,8 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCheckCircle, faTimesCircle, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faTimesCircle, faEye, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { LeaveRequestService } from '../../../services/leave-request.service';
+import { LeaveRequestResponseDto, LeaveStatus } from '../../../models/leave-request.models';
 
 @Component({
   selector: 'app-admin-requests',
@@ -11,116 +16,224 @@ import { faCheckCircle, faTimesCircle, faEye } from '@fortawesome/free-solid-svg
   standalone: true,
   imports: [CommonModule, FormsModule, FontAwesomeModule],
 })
-export class ManageRequests {
+export class ManageRequests implements OnInit, OnDestroy {
   faCheckCircle = faCheckCircle;
   faTimesCircle = faTimesCircle;
   faEye = faEye;
+  faRefresh = faRefresh;
 
+  // Filter properties
   searchTerm = '';
   filterStatus = '';
 
-  requests = [
-    { employee: 'Alice', startDate: '2025-07-10', endDate: '2025-07-12', reason: 'Family Event', status: 'Pending', halfDay: false, type: 'Vacation', createdAt: '2025-07-01', documentPath: '/assets/test.pdf' },
-    { employee: 'Bob', startDate: '2025-06-01', endDate: '2025-06-05', reason: 'Medical', status: 'Approved', halfDay: true, type: 'Sick Leave', createdAt: '2025-05-30', documentPath: '' },
-    { employee: 'Charlie', startDate: '2025-05-15', endDate: '2025-05-16', reason: 'Trip', status: 'Rejected', halfDay: false, type: 'Casual', createdAt: '2025-05-10', documentPath: '' },
-  ];
+  // Data properties
+  requests: LeaveRequestResponseDto[] = [];
+  isLoading = true;
+  errorMessage = '';
 
-  editUser = {
-    leaveBalance: [
-      { type: 'Sick Leave', daysLeft: 4 },
-      { type: 'Vacation', daysLeft: 10 },
-      { type: 'Casual', daysLeft: 2 },
-    ]
-  };
-
-  filteredRequests() {
-    return this.requests.filter(r =>
-      (r.employee.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        r.reason.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
-      (!this.filterStatus || r.status === this.filterStatus)
-    );
-  }
-
-  countRequests(status: string) {
-    return this.requests.filter(r => r.status === status).length;
-  }
-
-  approve(req: any) {
-    req.status = 'Approved';
-  }
-
-  reject(req: any) {
-    req.status = 'Rejected';
-  }
-
+  // Modal properties
   showRequestModal = false;
-  selectedRequest: any = null;
+  showRejectModal = false;
+  selectedRequest: LeaveRequestResponseDto | null = null;
+  rejectReason = '';
+  isProcessing = false;
 
-  openRequestModal(request: any) {
+  // Enums for template
+  LeaveStatus = LeaveStatus;
+
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private leaveRequestService: LeaveRequestService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.loadRequests();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadRequests(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    // Use the existing leave request service which should work for admin too
+    this.leaveRequestService.getAllRequestsForAdmin()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (requests) => {
+          this.requests = requests;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading requests:', error);
+          this.errorMessage = 'Failed to load requests. Please try again.';
+          this.isLoading = false;
+        }
+      });
+  }
+
+  filteredRequests(): LeaveRequestResponseDto[] {
+    return this.requests.filter(request => {
+      const matchesSearch = !this.searchTerm || 
+        request.employeeName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        request.reason.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      const matchesStatus = !this.filterStatus || request.status === this.filterStatus;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }
+
+  onFiltersChange(): void {
+    // Filters are applied through filteredRequests() method
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.filterStatus = '';
+  }
+
+  refreshData(): void {
+    this.loadRequests();
+  }
+
+  // Simple approve action
+  approveRequest(request: LeaveRequestResponseDto): void {
+    if (this.isProcessing) return;
+    
+    if (!confirm(`Are you sure you want to approve ${request.employeeName || 'this employee'}'s leave request?`)) {
+      return;
+    }
+
+    this.isProcessing = true;
+    
+    this.leaveRequestService.updateRequestStatus(request.id, LeaveStatus.ACCEPTED)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Request approved successfully');
+          this.isProcessing = false;
+          this.refreshData();
+        },
+        error: (error) => {
+          console.error('Error approving request:', error);
+          this.errorMessage = 'Failed to approve request. Please try again.';
+          this.isProcessing = false;
+        }
+      });
+  }
+
+  // Open reject modal
+  openRejectModal(request: LeaveRequestResponseDto): void {
+    this.selectedRequest = request;
+    this.rejectReason = '';
+    this.showRejectModal = true;
+  }
+
+  closeRejectModal(): void {
+    this.showRejectModal = false;
+    this.selectedRequest = null;
+    this.rejectReason = '';
+  }
+
+  // Reject with reason
+  confirmReject(): void {
+    if (!this.selectedRequest || !this.rejectReason.trim() || this.isProcessing) return;
+
+    this.isProcessing = true;
+
+    this.leaveRequestService.updateRequestStatus(this.selectedRequest.id, LeaveStatus.REJECTED, this.rejectReason)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Request rejected successfully');
+          this.closeRejectModal();
+          this.isProcessing = false;
+          this.refreshData();
+        },
+        error: (error) => {
+          console.error('Error rejecting request:', error);
+          this.errorMessage = 'Failed to reject request. Please try again.';
+          this.isProcessing = false;
+        }
+      });
+  }
+
+  // Modal methods
+  openRequestModal(request: LeaveRequestResponseDto): void {
     this.selectedRequest = request;
     this.showRequestModal = true;
   }
 
-  closeRequestModal() {
+  closeRequestModal(): void {
     this.showRequestModal = false;
     this.selectedRequest = null;
   }
 
-
-  showApproveModal = false;
-selectedLeaveType = '';
-paidOption = 'PAID';
-showRejectModal = false;
-
-openApprovePopup(request: any) {
-  this.selectedRequest = request;
-  this.selectedLeaveType = request.type;
-  this.showApproveModal = true;
-
-  // 👇 Keep the main request modal open
-  // Do NOT set showRequestModal = false
-}
-
-closeApproveModal() {
-  this.showApproveModal = false;
-}
-
-openRejectPopup(request: any) {
-  this.selectedRequest = request;
-  this.showRejectModal = true;
-
-  // Do NOT close showRequestModal
-}
-
-closeRejectPopup() {
-  this.showRejectModal = false;
-}
-
-
-// Optional helper to get remaining days for selected leave type
-getDaysLeft(type: string): number {
-  const found = this.editUser.leaveBalance.find(b => b.type === type);
-  return found ? found.daysLeft : 0;
-}
-
-// You can handle confirmation here
-confirmApprove() {
-  if (this.selectedRequest) {
-    this.selectedRequest.status = 'Approved';
-    // You could log paidOption here or send to backend
-    this.closeApproveModal();
+  // Utility methods
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
   }
-}
-rejectRemark = '';
 
-confirmReject() {
-  if (this.selectedRequest) {
-    this.selectedRequest.status = 'Rejected';
-    console.log('Rejected with remark:', this.rejectRemark);
-    this.rejectRemark = '';
-    this.closeRejectPopup();
-    this.closeRequestModal(); // optional: auto-close request popup
+  calculateDaysText(request: LeaveRequestResponseDto): string {
+    if (request.halfDay) {
+      return '0.5 day';
+    }
+    if (request.startDate === request.endDate) {
+      return '1 day';
+    }
+    const startDate = new Date(request.startDate);
+    const endDate = new Date(request.endDate);
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return `${diffDays} days`;
   }
-}
 
+  getStatusClasses(status: LeaveStatus): string {
+    switch (status) {
+      case LeaveStatus.ACCEPTED:
+        return 'bg-green-100 text-green-800';
+      case LeaveStatus.REJECTED:
+        return 'bg-red-100 text-red-800';
+      case LeaveStatus.PENDING:
+      default:
+        return 'bg-yellow-100 text-yellow-800';
+    }
+  }
+
+  getEmployeeInitials(employeeName: string): string {
+    if (!employeeName) return '?';
+    
+    return employeeName
+      .split(' ')
+      .filter(name => name.length > 0)
+      .map(name => name.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  downloadDocument(documentPath: string): void {
+    if (documentPath) {
+      window.open(`http://localhost:8080/uploads/${documentPath}`, '_blank');
+    }
+  }
+
+  // Statistics
+  getRequestStats() {
+    return {
+      pending: this.requests.filter(r => r.status === LeaveStatus.PENDING).length,
+      approved: this.requests.filter(r => r.status === LeaveStatus.ACCEPTED).length,
+      rejected: this.requests.filter(r => r.status === LeaveStatus.REJECTED).length,
+      total: this.requests.length
+    };
+  }
 }
