@@ -1,159 +1,262 @@
 <div class="dashboard space-y-6">
-    <!-- Header + Action Buttons -->
-    <div class="flex flex-row justify-between items-center">
-      <h1 class="title">Admin Dashboard</h1>
-      <div class="flex gap-2">
-        <button
-          class="bg-white text-gray-800 border border-gray-300 px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-100"
-        >
-          <fa-icon [icon]="faCalendar"></fa-icon>
-          <span>View Calendar</span>
-        </button>
-        <button
-          class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
-        >
-          <fa-icon [icon]="faChartLine"></fa-icon>
-          <span>Generate Report</span>
-        </button>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
       </div>
+      <button 
+        (click)="refreshDashboard()"
+        class="text-red-600 hover:text-red-800 text-sm underline"
+      >
+        Retry
+      </button>
     </div>
-  
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <app-card
-        title="Total Employees"
-        [value]="'63'"
-        subtitle="active members"
-        [icon]="faUsers"
-        bgColor="bg-blue-100"
-        iconColor="text-blue-600"
-      ></app-card>
-  
-      <app-card
-        title="Pending Requests"
-        [value]="'8'"
-        subtitle="need approval"
-        [icon]="faClock"
-        bgColor="bg-yellow-100"
-        iconColor="text-yellow-600"
-      ></app-card>
-  
-      <app-card
-        title="On Leave Today"
-        [value]="'6'"
-        subtitle="employees away"
-        [icon]="faCheckCircle"
-        bgColor="bg-green-100"
-        iconColor="text-green-600"
-      ></app-card>
-  
-      <app-card
-        title="Over Limit"
-        [value]="'2'"
-        subtitle="employees flagged"
-        [icon]="faExclamationTriangle"
-        bgColor="bg-red-100"
-        iconColor="text-red-600"
-      ></app-card>
-    </div>
-  
-    <!-- Pending Approval -->
-    <div  class="bg-white rounded-xl shadow-sm p-4 border border-blue-200">
-      <div class=" p-4 font-semibold text-lg flex justify-between">
-        <span class="text-lg font-semibold mb-4">Pending Approval</span>
-        <a href="#" class="text-sm text-blue-600">View all</a>
-      </div>
-  
-      <div >
-        <div class="p-4 flex justify-between items-center">
-          <div>
-            <div class="font-medium">Sarah Johnson <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Annual Leave</span></div>
-            <div class="text-sm text-gray-500">Jan 15–20, 2025 • 5 days</div>
-            <div class="text-xs text-gray-400">Submitted 2 hours ago</div>
-          </div>
-          <div class="flex gap-2">
-            <button class="bg-green-600 text-white px-4 py-1 rounded hover:cursor-pointer">Approve</button>
-            <button class="bg-red-600 text-white px-4 py-1 rounded hover:cursor-pointer">Reject</button>
-          </div>
-        </div>
-  
-        <div class="p-4 flex justify-between items-center">
-          <div>
-            <div class="font-medium">Mike Chen <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Sick Leave</span></div>
-            <div class="text-sm text-gray-500">Jan 8, 2025 • 1 day</div>
-            <div class="text-xs text-gray-400">Submitted 1 day ago</div>
-          </div>
-          <div class="flex gap-2">
-            <button class="bg-green-600 text-white px-4 py-1 rounded">Approve</button>
-            <button class="bg-red-600 text-white px-4 py-1 rounded">Reject</button>
-          </div>
-        </div>
-  
-        <div class="p-4 flex justify-between items-center">
-          <div>
-            <div class="font-medium">Emma Davis <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Personal Leave</span></div>
-            <div class="text-sm text-gray-500">Jan 22, 2025 • 1 day</div>
-            <div class="text-xs text-gray-400">Submitted 3 hours ago</div>
-          </div>
-          <div class="flex gap-2">
-            <button class="bg-green-600 text-white px-4 py-1 rounded">Approve</button>
-            <button class="bg-red-600 text-white px-4 py-1 rounded">Reject</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  
-    <div class="bg-white rounded-lg shadow">
-        <div class=" p-4 font-semibold text-lg">Team Overview</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-          <div class="bg-gray-50 p-4 rounded shadow-sm">
-            <div class="flex justify-between items-center">
-              <div class="font-bold text-lg">Engineering</div>
-              <div class="text-sm text-gray-500">25 total</div>
-            </div>
-            <div class="text-sm mt-2">
-              <span class="text-green-600 font-medium">● On Leave: 3</span>
-              &nbsp;&nbsp;
-              <span class="text-yellow-600 font-medium">● Pending: 2</span>
-            </div>
-          </div>
-    
-          <div class="bg-gray-50 p-4 rounded shadow-sm">
-            <div class="flex justify-between items-center">
-              <div class="font-bold text-lg">Marketing</div>
-              <div class="text-sm text-gray-500">12 total</div>
-            </div>
-            <div class="text-sm mt-2">
-              <span class="text-green-600 font-medium">● On Leave: 1</span>
-              &nbsp;&nbsp;
-              <span class="text-yellow-600 font-medium">● Pending: 1</span>
-            </div>
-          </div>
-    
-          <div class="bg-gray-50 p-4 rounded shadow-sm">
-            <div class="flex justify-between items-center">
-              <div class="font-bold text-lg">Sales</div>
-              <div class="text-sm text-gray-500">18 total</div>
-            </div>
-            <div class="text-sm mt-2">
-              <span class="text-green-600 font-medium">● On Leave: 2</span>
-              &nbsp;&nbsp;
-              <span class="text-yellow-600 font-medium">● Pending: 0</span>
-            </div>
-          </div>
-    
-          <div class="bg-gray-50 p-4 rounded shadow-sm">
-            <div class="flex justify-between items-center">
-              <div class="font-bold text-lg">HR</div>
-              <div class="text-sm text-gray-500">8 total</div>
-            </div>
-            <div class="text-sm mt-2">
-              <span class="text-green-600 font-medium">● On Leave: 0</span>
-              &nbsp;&nbsp;
-              <span class="text-yellow-600 font-medium">● Pending: 1</span>
-            </div>
-          </div>
-        </div>
-      </div>
   </div>
-  
+
+  <!-- Header + Action Buttons -->
+  <div class="flex flex-row justify-between items-center">
+    <div>
+      <h1 class="title">Admin Dashboard</h1>
+      <p class="text-gray-600 text-sm mt-1">Manage leave requests and monitor team activity</p>
+    </div>
+    <div class="flex gap-2">
+      <button
+        (click)="navigateToHolidays()"
+        class="bg-white text-gray-800 border border-gray-300 px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-100 transition"
+      >
+        <fa-icon [icon]="faCalendar"></fa-icon>
+        <span>View Calendar</span>
+      </button>
+      <button
+        (click)="navigateToStatistics()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700 transition"
+      >
+        <fa-icon [icon]="faChartLine"></fa-icon>
+        <span>View Statistics</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State for Cards -->
+  <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div *ngFor="let i of [1,2,3,4]" class="bg-white rounded-lg p-6 shadow animate-pulse">
+      <div class="flex items-center justify-between">
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded w-20"></div>
+          <div class="h-8 bg-gray-200 rounded w-12"></div>
+          <div class="h-3 bg-gray-200 rounded w-16"></div>
+        </div>
+        <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <app-card
+      title="Total Employees"
+      [value]="adminStats.totalEmployees.toString()"
+      subtitle="active members"
+      [icon]="faUsers"
+      bgColor="bg-blue-100"
+      iconColor="text-blue-600"
+      [clickable]="true"
+      (cardClick)="navigateToManageEmployees()"
+    ></app-card>
+
+    <app-card
+      title="Pending Requests"
+      [value]="adminStats.pendingRequests.toString()"
+      subtitle="need approval"
+      [icon]="faClock"
+      bgColor="bg-yellow-100"
+      iconColor="text-yellow-600"
+      [clickable]="true"
+      (cardClick)="navigateToManageRequests()"
+    ></app-card>
+
+    <app-card
+      title="On Leave Today"
+      [value]="adminStats.onLeaveToday.toString()"
+      subtitle="employees away"
+      [icon]="faCheckCircle"
+      bgColor="bg-green-100"
+      iconColor="text-green-600"
+      [clickable]="true"
+      (cardClick)="navigateToManageEmployees()"
+    ></app-card>
+
+    <app-card
+      title="Over Limit"
+      [value]="adminStats.overLimit.toString()"
+      subtitle="employees flagged"
+      [icon]="faExclamationTriangle"
+      bgColor="bg-red-100"
+      iconColor="text-red-600"
+      [clickable]="true"
+      (cardClick)="navigateToManageEmployees()"
+    ></app-card>
+  </div>
+
+  <!-- Pending Approval -->
+  <div class="bg-white rounded-xl shadow-sm p-4 border border-blue-200">
+    <div class="flex justify-between items-center p-4">
+      <h2 class="text-lg font-semibold">Pending Approval</h2>
+      <button 
+        (click)="navigateToManageRequests()"
+        class="text-sm text-blue-600 hover:text-blue-800"
+      >
+        View all
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="space-y-4">
+      <div *ngFor="let i of [1,2,3]" class="p-4 flex justify-between items-center animate-pulse">
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded w-48"></div>
+          <div class="h-3 bg-gray-200 rounded w-32"></div>
+          <div class="h-3 bg-gray-200 rounded w-24"></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="h-8 bg-gray-200 rounded w-16"></div>
+          <div class="h-8 bg-gray-200 rounded w-16"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && pendingRequests.length === 0" class="text-center py-8">
+      <div class="flex flex-col items-center space-y-3">
+        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-gray-900">No pending requests</h3>
+          <p class="text-sm text-gray-500">All leave requests have been processed.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Requests List -->
+    <div *ngIf="!isLoading && pendingRequests.length > 0" class="space-y-1">
+      <div 
+        *ngFor="let request of pendingRequests.slice(0, 5)" 
+        class="p-4 flex justify-between items-center hover:bg-gray-50 rounded-lg transition-colors"
+      >
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-medium">{{ request.employeeName || 'Employee' }}</span>
+            <span 
+              class="text-xs font-semibold px-2 py-0.5 rounded"
+              [ngClass]="getStatusBadgeClass(request.status)"
+            >
+              {{ request.type }}
+            </span>
+          </div>
+          <div class="text-sm text-gray-500">
+            {{ formatDate(request.startDate) }}
+            <span *ngIf="request.startDate !== request.endDate">
+              – {{ formatDate(request.endDate) }}
+            </span>
+            • 
+            {{ calculateDaysText(request) }}
+          </div>
+          <div class="text-xs text-gray-400">
+            Submitted {{ formatDate(request.startDate) }}
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button 
+            (click)="approveRequest(request.id)"
+            class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition text-sm"
+          >
+            Approve
+          </button>
+          <button 
+            (click)="rejectRequest(request.id)"
+            class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 transition text-sm"
+          >
+            Reject
+          </button>
+          <button 
+            (click)="viewRequestDetails(request.id)"
+            class="text-blue-600 hover:text-blue-800 px-2 py-1 text-sm"
+            title="View Details"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <button 
+        (click)="navigateToManageRequests()"
+        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faClipboard" class="text-blue-600 text-xl mb-2"></fa-icon>
+        <span class="text-sm font-medium">Manage Requests</span>
+      </button>
+      
+      <button 
+        (click)="navigateToManageEmployees()"
+        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faUsers" class="text-green-600 text-xl mb-2"></fa-icon>
+        <span class="text-sm font-medium">Manage Employees</span>
+      </button>
+      
+      <button 
+        (click)="navigateToStatistics()"
+        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faChartLine" class="text-purple-600 text-xl mb-2"></fa-icon>
+        <span class="text-sm font-medium">View Statistics</span>
+      </button>
+      
+      <button 
+        (click)="navigateToHolidays()"
+        class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faCalendar" class="text-orange-600 text-xl mb-2"></fa-icon>
+        <span class="text-sm font-medium">Holiday Calendar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Activity Summary -->
+  <div class="bg-white rounded-lg shadow p-6" *ngIf="!isLoading">
+    <h3 class="text-lg font-semibold mb-4">Today's Summary</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <div class="text-blue-600 font-semibold">Total Requests</div>
+        <div class="text-2xl font-bold text-blue-800">{{ recentRequests.length }}</div>
+        <div class="text-blue-600">This month</div>
+      </div>
+      
+      <div class="bg-yellow-50 p-4 rounded-lg">
+        <div class="text-yellow-600 font-semibold">Pending Review</div>
+        <div class="text-2xl font-bold text-yellow-800">{{ pendingRequests.length }}</div>
+        <div class="text-yellow-600">Awaiting approval</div>
+      </div>
+      
+      <div class="bg-green-50 p-4 rounded-lg">
+        <div class="text-green-600 font-semibold">Employees Away</div>
+        <div class="text-2xl font-bold text-green-800">{{ adminStats.onLeaveToday }}</div>
+        <div class="text-green-600">Currently on leave</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,91 +1,295 @@
 <div class="dashboard space-y-6">
-    <!-- Header -->
-    <div class="flex flex-row justify-between items-center">
+  <!-- Header -->
+  <div class="flex flex-row justify-between items-center">
+    <div>
       <h1 class="title">Leave Balance</h1>
-      <!-- <button
-        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+      <p class="text-gray-600 text-sm mt-1">Track your leave entitlements and usage for {{ balanceSummary.currentYear }}</p>
+    </div>
+    <div class="flex gap-2">
+      <button
+        (click)="refreshData()"
+        class="bg-white text-gray-800 border border-gray-300 px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-100 transition"
+        [disabled]="isLoading"
+      >
+        <fa-icon [icon]="faRefresh" [class.animate-spin]="isLoading"></fa-icon>
+        <span>Refresh</span>
+      </button>
+      <button
+        (click)="navigateToApplyLeave()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700 transition"
       >
         <fa-icon [icon]="faPlus"></fa-icon>
         <span>Apply for Leave</span>
-      </button> -->
+      </button>
     </div>
-  
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <app-card
-        title="Available Leave"
-        [value]="'18'"
-        subtitle="days remaining"
-        [icon]="faCalendar"
-        bgColor="bg-blue-100"
-        iconColor="text-blue-600"
-      ></app-card>
-  
-      <app-card
-        title="Used This Year"
-        [value]="'7'"
-        subtitle="days taken"
-        [icon]="faClock"
-        bgColor="bg-green-100"
-        iconColor="text-green-600"
-      ></app-card>
-  
-      <app-card
-        title="Pending Requests"
-        [value]="'1'"
-        subtitle="awaiting approval"
-        [icon]="faClipboard"
-        bgColor="bg-yellow-100"
-        iconColor="text-yellow-600"
-      ></app-card>
-  
-      <app-card
-        title="Approved Requests"
-        [value]="'3'"
-        subtitle="this year"
-        [icon]="faCheckCircle"
-        bgColor="bg-purple-100"
-        iconColor="text-purple-600"
-      ></app-card>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      </div>
+      <button 
+        (click)="refreshData()"
+        class="text-red-600 hover:text-red-800 text-sm underline"
+      >
+        Retry
+      </button>
     </div>
-  
-    <!-- Leave History Table -->
-    <div class="bg-white rounded-lg shadow p-4">
-      <h2 class="text-xl font-bold mb-4">Leave History</h2>
-      <div class="overflow-auto rounded-md">
-        <table class="w-full text-sm text-left text-gray-700">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-            <tr>
-              <th class="px-4 py-3">Type</th>
-              <th class="px-4 py-3">From</th>
-              <th class="px-4 py-3">To</th>
-              <th class="px-4 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="let entry of leaveHistory"
-              class="bg-white border-b hover:bg-gray-50"
-            >
-              <td class="px-4 py-3">{{ entry.type }}</td>
-              <td class="px-4 py-3">{{ entry.from }}</td>
-              <td class="px-4 py-3">{{ entry.to }}</td>
-              <td class="px-4 py-3">
-                <span
-                  [ngClass]="{
-                    'text-green-600': entry.status === 'Approved',
-                    'text-red-600': entry.status === 'Rejected',
-                    'text-yellow-600': entry.status === 'Pending'
-                  }"
-                  class="font-medium"
-                >
-                  {{ entry.status }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  </div>
+
+  <!-- Loading State for Summary Cards -->
+  <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div *ngFor="let i of [1,2,3,4]" class="bg-white rounded-lg p-6 shadow animate-pulse">
+      <div class="flex items-center justify-between">
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded w-20"></div>
+          <div class="h-8 bg-gray-200 rounded w-12"></div>
+          <div class="h-3 bg-gray-200 rounded w-16"></div>
+        </div>
+        <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Summary Cards -->
+  <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <app-card
+      title="Total Allowance"
+      [value]="balanceSummary.totalAllowance.toString()"
+      subtitle="days allocated"
+      [icon]="faCalendar"
+      bgColor="bg-blue-100"
+      iconColor="text-blue-600"
+      [clickable]="false"
+    ></app-card>
+
+    <app-card
+      title="Used This Year"
+      [value]="balanceSummary.totalUsed.toString()"
+      subtitle="days taken"
+      [icon]="faClock"
+      bgColor="bg-green-100"
+      iconColor="text-green-600"
+      [clickable]="true"
+      (cardClick)="navigateToMyRequests()"
+    ></app-card>
+
+    <app-card
+      title="Remaining Days"
+      [value]="balanceSummary.totalRemaining.toString()"
+      subtitle="days available"
+      [icon]="faCheckCircle"
+      bgColor="bg-purple-100"
+      iconColor="text-purple-600"
+      [clickable]="false"
+    ></app-card>
+
+    <app-card
+      title="Pending Requests"
+      [value]="balanceSummary.totalPending.toString()"
+      subtitle="awaiting approval"
+      [icon]="faClipboard"
+      bgColor="bg-yellow-100"
+      iconColor="text-yellow-600"
+      [clickable]="true"
+      (cardClick)="navigateToMyRequests()"
+    ></app-card>
+  </div>
+
+  <!-- Leave Balance by Type -->
+  <div class="bg-white rounded-lg shadow p-6" *ngIf="!isLoading">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold">Leave Balance by Type</h2>
+      <button 
+        (click)="navigateToCalendar()"
+        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+      >
+        View Calendar
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="balanceSummary.balancesByType.length === 0" class="text-center py-8">
+      <div class="flex flex-col items-center space-y-3">
+        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-gray-900">No leave balance data</h3>
+          <p class="text-sm text-gray-500">Your leave balance will appear here once initialized.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Types Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" *ngIf="balanceSummary.balancesByType.length > 0">
+      <div 
+        *ngFor="let balance of balanceSummary.balancesByType" 
+        class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-semibold text-gray-900">{{ balance.leaveTypeName }}</h3>
+            <p class="text-sm text-gray-500">{{ balance.period }}</p>
+          </div>
+          <div 
+            class="px-3 py-1 rounded-full text-sm font-medium"
+            [ngClass]="getLeaveTypeClasses(balance.leaveTypeName)"
+          >
+            {{ balance.remainingDays }}/{{ balance.totalAllowance }}
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-4">
+          <div class="flex justify-between text-sm text-gray-600 mb-1">
+            <span>Usage: {{ getUsagePercentage(balance.usedDays, balance.totalAllowance) }}%</span>
+            <span>{{ balance.usedDays }} used</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              class="h-2 rounded-full transition-all duration-300"
+              [style.width.%]="getUsagePercentage(balance.usedDays, balance.totalAllowance)"
+              [ngClass]="{
+                'bg-green-500': getUsagePercentage(balance.usedDays, balance.totalAllowance) <= 50,
+                'bg-yellow-500': getUsagePercentage(balance.usedDays, balance.totalAllowance) > 50 && getUsagePercentage(balance.usedDays, balance.totalAllowance) <= 80,
+                'bg-red-500': getUsagePercentage(balance.usedDays, balance.totalAllowance) > 80
+              }"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Balance Details -->
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div class="text-lg font-semibold text-green-600">{{ balance.remainingDays }}</div>
+            <div class="text-xs text-gray-500">Remaining</div>
+          </div>
+          <div>
+            <div class="text-lg font-semibold text-blue-600">{{ balance.usedDays }}</div>
+            <div class="text-xs text-gray-500">Used</div>
+          </div>
+          <div>
+            <div class="text-lg font-semibold text-yellow-600">{{ balance.pendingDays }}</div>
+            <div class="text-xs text-gray-500">Pending</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave History Table -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold">Recent Leave History</h2>
+      <button 
+        (click)="navigateToMyRequests()"
+        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+      >
+        View All Requests
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="leaveHistory.length === 0 && !isLoading" class="text-center py-8">
+      <div class="flex flex-col items-center space-y-3">
+        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-gray-900">No leave history</h3>
+          <p class="text-sm text-gray-500">Your leave requests will appear here once you apply for leave.</p>
+        </div>
+        <button 
+          (click)="navigateToApplyLeave()"
+          class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition"
+        >
+          Apply for Your First Leave
+        </button>
+      </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="overflow-auto rounded-md" *ngIf="leaveHistory.length > 0">
+      <table class="w-full text-sm text-left text-gray-700">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+          <tr>
+            <th class="px-4 py-3">Type</th>
+            <th class="px-4 py-3">Period</th>
+            <th class="px-4 py-3">Days</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Applied</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let entry of leaveHistory"
+            class="bg-white border-b hover:bg-gray-50 transition-colors"
+          >
+            <td class="px-4 py-3">
+              <div 
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                [ngClass]="getLeaveTypeClasses(entry.type)"
+              >
+                {{ entry.type }}
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              {{ formatDateRange(entry.startDate, entry.endDate) }}
+            </td>
+            <td class="px-4 py-3">
+              <span class="font-medium">{{ entry.days }}</span>
+              <span *ngIf="entry.halfDay" class="text-xs text-gray-500 ml-1">(Half Day)</span>
+            </td>
+            <td class="px-4 py-3">
+              <span
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                [ngClass]="getStatusClasses(entry.status)"
+              >
+                {{ entry.status }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-gray-500">
+              {{ formatDate(entry.startDate) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white rounded-lg p-6 shadow">
+    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <button 
+        (click)="navigateToApplyLeave()"
+        class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faPlus" class="text-blue-600 mr-2"></fa-icon>
+        <span>Apply for Leave</span>
+      </button>
+      
+      <button 
+        (click)="navigateToCalendar()"
+        class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faCalendar" class="text-green-600 mr-2"></fa-icon>
+        <span>View Calendar</span>
+      </button>
+      
+      <button 
+        (click)="navigateToMyRequests()"
+        class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+      >
+        <fa-icon [icon]="faClipboard" class="text-purple-600 mr-2"></fa-icon>
+        <span>My Requests</span>
+      </button>
+    </div>
+  </div>
+</div>

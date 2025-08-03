@@ -1,52 +1,128 @@
 <div class="dashboard space-y-6">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+          <p class="text-sm text-red-700">{{ errorMessage }}</p>
+        </div>
+        <button 
+          (click)="refreshDashboard()"
+          class="text-red-600 hover:text-red-800 text-sm underline"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
 
     <div class="flex flex-row justify-between items-center">
-      <h1 class="title">Welcome Back, Name!</h1>
+      <div>
+        <h1 class="title">Welcome Back, {{ currentUserName }}!</h1>
+        <p class="text-gray-600 text-sm mt-1">Here's your leave management overview</p>
+      </div>
       <button
-        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700"
+        (click)="navigateToApplyLeave()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700 transition"
       >
         <fa-icon [icon]="faPlus"></fa-icon>
         <span>Apply for Leave</span>
       </button>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div *ngFor="let i of [1,2,3,4]" class="bg-white rounded-lg p-6 shadow animate-pulse">
+        <div class="flex items-center justify-between">
+          <div class="space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-20"></div>
+            <div class="h-8 bg-gray-200 rounded w-12"></div>
+            <div class="h-3 bg-gray-200 rounded w-16"></div>
+          </div>
+          <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <app-card
         title="Available Leave"
-        [value]="'18'"
+        [value]="dashboardStats.availableLeave.toString()"
         subtitle="days remaining"
         [icon]="faCalendar"
         bgColor="bg-blue-100"
         iconColor="text-blue-600"
+        [clickable]="true"
+        (cardClick)="navigateToLeaveBalance()"
       ></app-card>
   
       <app-card
         title="Used This Year"
-        [value]="'7'"
+        [value]="dashboardStats.usedThisYear.toString()"
         subtitle="days taken"
         [icon]="faClock"
         bgColor="bg-green-100"
         iconColor="text-green-600"
+        [clickable]="true"
+        (cardClick)="navigateToMyRequests()"
       ></app-card>
   
       <app-card
         title="Pending Requests"
-        [value]="'1'"
+        [value]="dashboardStats.pendingRequests.toString()"
         subtitle="awaiting approval"
         [icon]="faClipboard"
         bgColor="bg-yellow-100"
         iconColor="text-yellow-600"
+        [clickable]="true"
+        (cardClick)="navigateToMyRequests()"
       ></app-card>
   
       <app-card
         title="Approved Requests"
-        [value]="'3'"
+        [value]="dashboardStats.approvedRequests.toString()"
         subtitle="this year"
         [icon]="faCheckCircle"
         bgColor="bg-purple-100"
         iconColor="text-purple-600"
+        [clickable]="true"
+        (cardClick)="navigateToMyRequests()"
       ></app-card>
     </div>
+
+    <!-- Recent Leave Requests -->
     <app-recent-leave></app-recent-leave>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg p-6 shadow">
+      <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <button 
+          (click)="navigateToCalendar()"
+          class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+        >
+          <fa-icon [icon]="faCalendar" class="text-blue-600 mr-2"></fa-icon>
+          <span>View Calendar</span>
+        </button>
+        
+        <button 
+          (click)="navigateToMyRequests()"
+          class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+        >
+          <fa-icon [icon]="faClipboard" class="text-green-600 mr-2"></fa-icon>
+          <span>My Requests</span>
+        </button>
+        
+        <button 
+          (click)="navigateToLeaveBalance()"
+          class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+        >
+          <fa-icon [icon]="faCheckCircle" class="text-purple-600 mr-2"></fa-icon>
+          <span>Leave Balance</span>
+        </button>
+      </div>
+    </div>
   </div>
   

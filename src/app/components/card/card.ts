@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -16,4 +16,13 @@ export class Card {
   @Input() icon: any;
   @Input() bgColor = 'bg-gray-100';
   @Input() iconColor = 'text-gray-500';
+  @Input() clickable = false;
+  
+  @Output() cardClick = new EventEmitter<void>();
+
+  onCardClick(): void {
+    if (this.clickable) {
+      this.cardClick.emit();
+    }
+  }
 }
