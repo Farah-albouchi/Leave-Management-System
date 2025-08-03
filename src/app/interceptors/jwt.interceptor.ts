@@ -42,7 +42,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       // Handle 401 Unauthorized responses
       if (error.status === 401 && !isAuthEndpoint) {
         console.warn('JWT token expired or invalid, logging out...');
-        authService.logout();
+        authService.forceLogout(); // Use forceLogout to avoid calling backend during token issues
       }
       
       return throwError(() => error);

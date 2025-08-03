@@ -71,35 +71,110 @@
           </g>
         </svg>
       
-        <!-- Red dot -->
+        <!-- Red dot for unread notifications -->
         <span
-          class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"
-        ></span>
+          *ngIf="unreadCount > 0"
+          class="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 text-xs font-medium text-white bg-red-500 rounded-full ring-2 ring-white"
+        >
+          {{ unreadCount > 99 ? '99+' : unreadCount }}
+        </span>
       </div>
-      <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg z-50">
+      
+      <!-- Notifications Dropdown -->
+      <div *ngIf="showNotifications" class="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg z-50 border">
         <div class="p-4 border-b flex justify-between items-center">
           <h3 class="font-bold text-lg">Notifications</h3>
-          <a class="text-sm text-blue-600 cursor-pointer hover:underline">Mark all read</a>
+          <div class="flex gap-2">
+            <button 
+              (click)="markAllAsRead()"
+              class="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+              [disabled]="unreadCount === 0"
+            >
+              Mark all read
+            </button>
+            <button 
+              (click)="clearAllNotifications()"
+              class="text-sm text-red-600 hover:text-red-800 cursor-pointer"
+              [disabled]="notifications.length === 0"
+            >
+              Clear all
+            </button>
+          </div>
         </div>
     
         <div class="max-h-96 overflow-y-auto">
-          <div *ngFor="let n of notifications" [ngClass]="{ 'bg-blue-50': !n.read }" class="px-4 py-3 border-b hover:bg-gray-50">
-            <div class="flex items-start justify-between">
+          <!-- Empty state -->
+          <div *ngIf="notifications.length === 0" class="p-8 text-center">
+            <div class="flex flex-col items-center space-y-3">
+              <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM15 17H9a6 6 0 010-12h3m0 18v-6a6 6 0 016-6h3"></path>
+              </svg>
               <div>
-                <p class="font-semibold text-sm">
-                  <span [ngSwitch]="n.type">
-                    <span *ngSwitchCase="'success'" class="text-green-600">✔</span>
-                    <span *ngSwitchCase="'info'" class="text-blue-600">🕒</span>
-                    <span *ngSwitchCase="'warning'" class="text-yellow-600">⚠️</span>
-                  </span>
-                  {{ n.title }}
-                </p>
-                <p class="text-sm text-gray-600 mt-1">{{ n.message }}</p>
-                <p class="text-xs text-gray-400 mt-1">{{ n.time }}</p>
+                <h3 class="text-sm font-medium text-gray-900">No notifications</h3>
+                <p class="text-sm text-gray-500">You're all caught up!</p>
               </div>
-              <span *ngIf="!n.read" class="h-2 w-2 rounded-full bg-blue-600 mt-1.5"></span>
             </div>
           </div>
+
+          <!-- Notification items -->
+          <div 
+            *ngFor="let notification of notifications" 
+            (click)="onNotificationClick(notification)"
+            [ngClass]="{ 
+              'bg-blue-50': !notification.read,
+              'hover:bg-gray-50': notification.read,
+              'hover:bg-blue-100': !notification.read
+            }" 
+            class="px-4 py-3 border-b cursor-pointer transition-colors group"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-lg">{{ getNotificationIcon(notification.type) }}</span>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {{ notification.message }}
+                    </p>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ formatNotificationTime(notification.createdAt) }}
+                </p>
+              </div>
+              
+              <div class="flex items-center gap-2 ml-2">
+                <!-- Unread indicator -->
+                <span 
+                  *ngIf="!notification.read" 
+                  class="h-2 w-2 rounded-full bg-blue-600"
+                ></span>
+                
+                <!-- Delete button -->
+                <button 
+                  (click)="deleteNotification(notification, $event)"
+                  class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-all"
+                  title="Delete notification"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer with refresh button -->
+        <div class="p-3 border-t bg-gray-50 rounded-b-lg">
+          <button 
+            (click)="notificationService.refresh()"
+            class="w-full text-sm text-gray-600 hover:text-gray-800 py-1 flex items-center justify-center gap-1"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh
+          </button>
         </div>
       </div>
       </div>
@@ -173,12 +248,28 @@
           <hr class="my-2 border-gray-100">
           <button 
             (click)="logout()"
-            class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            [disabled]="isLoggingOut"
+            class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg class="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg 
+              *ngIf="!isLoggingOut"
+              class="w-4 h-4 mr-3 text-red-500" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
             </svg>
-            Sign Out
+            <svg 
+              *ngIf="isLoggingOut"
+              class="animate-spin w-4 h-4 mr-3 text-red-500" 
+              fill="none" 
+              viewBox="0 0 24 24"
+            >
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isLoggingOut ? 'Signing out...' : 'Sign Out' }}
           </button>
         </div>
       </div>

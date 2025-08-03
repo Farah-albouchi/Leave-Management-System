@@ -74,6 +74,28 @@ export class AuthService {
   }
 
   logout(): void {
+    // Call backend logout endpoint (optional for stateless JWT)
+    this.http.post(`${this.API_URL}/logout`, {}).pipe(
+      catchError(error => {
+        console.error('Logout error (continuing anyway):', error);
+        return [];
+      })
+    ).subscribe({
+      complete: () => {
+        // Clear local storage and state
+        this.performLogout();
+      }
+    });
+  }
+
+  /**
+   * Force logout without calling backend (for errors, token expiry, etc.)
+   */
+  forceLogout(): void {
+    this.performLogout();
+  }
+
+  private performLogout(): void {
     this.removeToken();
     this.removeUserData();
     this.currentUserSubject.next(null);
