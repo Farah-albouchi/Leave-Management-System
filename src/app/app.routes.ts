@@ -13,6 +13,7 @@ import { CalendarLeave } from './pages/calendar-leave/calendar-leave';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { LeaveBalance } from './pages/leave-balance/leave-balance';
 import { MyRequests } from './pages/my-requests/my-requests';
+import { EmployeeProfileComponent } from './pages/employee-profile/employee-profile';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
@@ -52,6 +53,12 @@ export const routes: Routes = [
       { 
         path: 'LeaveBalance', 
         component: LeaveBalance,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
+      { 
+        path: 'profile', 
+        component: EmployeeProfileComponent,
         canActivate: [RoleGuard],
         data: { requiredRole: 'EMPLOYEE' }
       },

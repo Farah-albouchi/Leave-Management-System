@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -309,35 +309,73 @@ export class ManageEmployees implements OnInit, OnDestroy {
     this.router.navigate(['/admin/manage-employees/profile', employee.id]);
   }
 
+  // Delete confirmation properties
+  deleteConfirmationText = '';
+  isDeleting = false;
+  @ViewChild('confirmInput') confirmInput!: ElementRef<HTMLInputElement>;
+
   // Delete confirmation methods
   openDeleteModal(employee: Employee): void {
     console.log('Opening delete modal for employee:', employee); // Debug log
+    
+    // Prevent deletion of admin users
+    if (employee.role === 'ADMIN') {
+      this.errorMessage = 'Admin users cannot be deleted for security reasons.';
+      return;
+    }
+    
     this.clearMessages();
     this.selectedEmployee = employee;
+    this.deleteConfirmationText = '';
+    this.isDeleting = false;
     this.showDeleteModal = true;
     document.body.classList.add('modal-open');
+    
+    // Focus on the confirmation input after the modal is rendered
+    setTimeout(() => {
+      if (this.confirmInput?.nativeElement) {
+        this.confirmInput.nativeElement.focus();
+      }
+    }, 100);
   }
 
   closeDeleteModal(): void {
     console.log('Closing delete modal'); // Debug log
     this.showDeleteModal = false;
     this.selectedEmployee = null;
+    this.deleteConfirmationText = '';
+    this.isDeleting = false;
     document.body.classList.remove('modal-open');
   }
 
   confirmDelete(): void {
-    if (this.selectedEmployee) {
+    if (this.selectedEmployee && this.deleteConfirmationText === 'DELETE') {
+      this.isDeleting = true;
       this.employeeService.deleteEmployee(this.selectedEmployee.id).subscribe({
         next: (response) => {
-          this.successMessage = response.message;
+          this.successMessage = `Employee ${this.formatEmployeeName(this.selectedEmployee!)} has been successfully deleted.`;
           this.closeDeleteModal();
           this.refreshData();
         },
         error: (error) => {
-          this.errorMessage = error.message;
-          this.closeDeleteModal();
+          this.errorMessage = `Failed to delete employee: ${error.message}`;
+          this.isDeleting = false;
         }
       });
+    }
+  }
+
+  // Check if delete confirmation is valid
+  isDeleteConfirmationValid(): boolean {
+    return this.deleteConfirmationText === 'DELETE';
+  }
+
+  // Handle keyboard events
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (this.showDeleteModal && event.key === 'Escape' && !this.isDeleting) {
+      event.preventDefault();
+      this.closeDeleteModal();
     }
   }
 

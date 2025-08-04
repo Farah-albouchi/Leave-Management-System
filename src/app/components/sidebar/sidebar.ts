@@ -8,6 +8,7 @@ import {
   faCalendarAlt,
   faChartPie,
   faUsers,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
@@ -44,6 +45,7 @@ export class SidebarComponent {
         { label: 'Apply Leave', path: '/ApplyLeave', icon: faCalendarCheck },
         { label: 'Calendar', path: '/CalendarLeave', icon: faCalendarAlt },
         { label: 'Leave Balance', path: '/LeaveBalance', icon: faChartPie },
+        { label: 'My Profile', path: '/profile', icon: faUser },
       ];
     }
   }

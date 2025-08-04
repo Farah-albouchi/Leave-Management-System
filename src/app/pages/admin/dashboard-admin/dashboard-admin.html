@@ -59,7 +59,7 @@
   <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <app-card
       title="Total Employees"
-      [value]="adminStats.totalEmployees.toString()"
+      [value]="dashboardSummary.totalEmployees.toString()"
       subtitle="active members"
       [icon]="faUsers"
       bgColor="bg-blue-100"
@@ -70,7 +70,7 @@
 
     <app-card
       title="Pending Requests"
-      [value]="getPendingCount().toString()"
+      [value]="dashboardSummary.pendingRequests.toString()"
       subtitle="need approval"
       [icon]="faClock"
       bgColor="bg-yellow-100"
@@ -81,7 +81,7 @@
 
     <app-card
       title="On Leave Today"
-      [value]="adminStats.onLeaveToday.toString()"
+      [value]="dashboardSummary.employeesOnLeaveToday.toString()"
       subtitle="employees away"
       [icon]="faCheckCircle"
       bgColor="bg-green-100"
@@ -91,14 +91,14 @@
     ></app-card>
 
     <app-card
-      title="Over Limit"
-      [value]="adminStats.overLimit.toString()"
-      subtitle="employees flagged"
-      [icon]="faExclamationTriangle"
-      bgColor="bg-red-100"
-      iconColor="text-red-600"
+      title="Total Requests"
+      [value]="dashboardSummary.totalRequests.toString()"
+      subtitle="all time requests"
+      [icon]="faClipboard"
+      bgColor="bg-purple-100"
+      iconColor="text-purple-600"
       [clickable]="true"
-      (cardClick)="navigateToEmployees()"
+      (cardClick)="navigateToAllRequests()"
     ></app-card>
   </div>
 
