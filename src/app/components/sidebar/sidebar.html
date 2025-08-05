@@ -32,27 +32,30 @@
       </a>
     </div>
     
-    <div>
-      <div class="border-t border-gray-200 my-2"></div>
-      <div class="sidebar-item cursor-pointer">
-        <svg
-          width="20px"
-          height="20px"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M21.593 10.943c.584.585.584 1.53 0 2.116L18.71 15.95c-.39.39-1.03.39-1.42 0a.996.996 0 0 1 0-1.41 9.552 9.552 0 0 1 1.689-1.345l.387-.242-.207-.206a10 10 0 0 1-2.24.254H8.998a1 1 0 1 1 0-2h7.921a10 10 0 0 1 2.24.254l.207-.206-.386-.241a9.562 9.562 0 0 1-1.69-1.348.996.996 0 0 1 0-1.41c.39-.39 1.03-.39 1.42 0l2.883 2.893zM14 16a1 1 0 0 0-1 1v1.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1.505a1 1 0 1 0 2 0V5.5A2.5 2.5 0 0 0 12.5 3h-7A2.5 2.5 0 0 0 3 5.5v13A2.5 2.5 0 0 0 5.5 21h7a2.5 2.5 0 0 0 2.5-2.5V17a1 1 0 0 0-1-1z"
-            fill="#5e5565"
-          ></path>
-        </svg>
-        <div *ngIf="!isSidebarCollapsed">
-          <p style="color: #5e5565">Sign Out</p>
-        </div>
-      </div>
-    </div>
+    <button 
+    (click)="logout()"
+    [disabled]="isLoggingOut"
+    class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    <svg 
+      *ngIf="!isLoggingOut"
+      class="w-6 h-6 mr-3 text-red-500" 
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+    </svg>
+    <svg 
+      *ngIf="isLoggingOut"
+      class="animate-spin w-6 h-6 mr-3 text-red-500" 
+      fill="none" 
+      viewBox="0 0 24 24"
+    >
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    {{ isLoggingOut ? 'Signing out...' : 'Sign Out' }}
+  </button>
   </div>
 </div>

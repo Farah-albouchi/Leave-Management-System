@@ -12,6 +12,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
+import { Subject, takeUntil } from 'rxjs';
+import { User } from '../../models/auth.models';
 
 @Component({
   standalone: true,
@@ -26,10 +30,21 @@ export class SidebarComponent {
   @Output() sidebarToggle = new EventEmitter<void>();
 
   faCalendar = faCalendarRegular;
-
+  currentUser: User | null = null;
   menuItems: { label: string; path: string; icon: any }[] = [];
-
+  isLoggingOut = false;
+  constructor(
+    private authService: AuthService,
+    public notificationService: NotificationService
+  ) {}
+    private destroy$ = new Subject<void>();
   ngOnInit() {
+        this.authService.currentUser$
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(user => {
+            this.currentUser = user;
+          });
+    
     if (this.role === 'admin') {
       this.menuItems = [
         { label: 'Dashboard', path: '/admin/dashboard', icon: faHome },
@@ -52,5 +67,9 @@ export class SidebarComponent {
 
   toggleSidebar() {
     this.sidebarToggle.emit();
+  }
+  logout(): void {
+    this.isLoggingOut = true;
+    this.authService.logout();
   }
 }

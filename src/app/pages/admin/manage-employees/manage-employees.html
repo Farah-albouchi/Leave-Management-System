@@ -1,9 +1,13 @@
 <div class="p-6 space-y-6">
   <!-- Header -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+  >
     <div>
       <h2 class="text-2xl font-bold text-gray-800">Manage Employees</h2>
-      <p class="text-gray-600 text-sm mt-1">Create, edit, and manage employee accounts</p>
+      <p class="text-gray-600 text-sm mt-1">
+        Create, edit, and manage employee accounts
+      </p>
     </div>
     <div class="flex gap-2">
       <button
@@ -33,25 +37,53 @@
   </div>
 
   <!-- Success/Error Messages -->
-  <div *ngIf="successMessage" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+  <div
+    *ngIf="successMessage"
+    class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg"
+  >
     <div class="flex items-center">
-      <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+      <svg
+        class="w-5 h-5 text-green-600 mr-2"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+          clip-rule="evenodd"
+        ></path>
       </svg>
       <p class="text-sm text-green-700">{{ successMessage }}</p>
-      <button (click)="clearMessages()" class="ml-auto text-green-600 hover:text-green-800">
+      <button
+        (click)="clearMessages()"
+        class="ml-auto text-green-600 hover:text-green-800"
+      >
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
     </div>
   </div>
 
-  <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+  <div
+    *ngIf="errorMessage"
+    class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
+  >
     <div class="flex items-center">
-      <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+      <svg
+        class="w-5 h-5 text-red-600 mr-2"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        ></path>
       </svg>
       <p class="text-sm text-red-700">{{ errorMessage }}</p>
-      <button (click)="clearMessages()" class="ml-auto text-red-600 hover:text-red-800">
+      <button
+        (click)="clearMessages()"
+        class="ml-auto text-red-600 hover:text-red-800"
+      >
         <fa-icon [icon]="faTimes"></fa-icon>
       </button>
     </div>
@@ -81,7 +113,9 @@
   <div class="bg-white p-4 rounded-lg shadow">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Search</label
+        >
         <input
           type="text"
           [(ngModel)]="filters.search"
@@ -103,7 +137,9 @@
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Status</label
+        >
         <select
           [(ngModel)]="filters.status"
           (ngModelChange)="onFiltersChange()"
@@ -138,15 +174,30 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && filteredEmployees.length === 0" class="bg-white rounded-lg shadow p-8">
+  <div
+    *ngIf="!isLoading && filteredEmployees.length === 0"
+    class="bg-white rounded-lg shadow p-8"
+  >
     <div class="text-center">
       <div class="flex flex-col items-center space-y-3">
-        <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        <svg
+          class="w-16 h-16 text-gray-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          ></path>
         </svg>
         <div>
           <h3 class="text-lg font-medium text-gray-900">No employees found</h3>
-          <p class="text-sm text-gray-500">Get started by adding your first employee.</p>
+          <p class="text-sm text-gray-500">
+            Get started by adding your first employee.
+          </p>
         </div>
         <button
           (click)="openAddModal()"
@@ -160,38 +211,76 @@
   </div>
 
   <!-- Employees Table -->
-  <div *ngIf="!isLoading && filteredEmployees.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+  <div
+    *ngIf="!isLoading && filteredEmployees.length > 0"
+    class="bg-white rounded-lg shadow overflow-hidden"
+  >
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Employee
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Contact
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Role
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Joined
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let employee of filteredEmployees" class="hover:bg-gray-50 transition-colors">
+          <tr
+            *ngFor="let employee of filteredEmployees"
+            class="hover:bg-gray-50 transition-colors"
+          >
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                <div
+                  class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm"
+                >
                   {{ getEmployeeInitials(employee) }}
                 </div>
                 <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ formatEmployeeName(employee) }}</div>
-                  <div class="text-sm text-gray-500">ID: {{ employee.id.substring(0, 8) }}...</div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ formatEmployeeName(employee) }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    ID: {{ employee.id.substring(0, 8) }}...
+                  </div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               <div>{{ employee.email }}</div>
-              <div class="text-xs text-gray-500">{{ employee.phone || 'No phone' }}</div>
+              <div class="text-xs text-gray-500">
+                {{ employee.phone || "No phone" }}
+              </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span 
+              <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 [ngClass]="getRoleClasses(employee.role)"
               >
@@ -199,52 +288,58 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span 
+              <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 [ngClass]="getStatusClasses(employee.profileCompleted)"
               >
-                {{ employee.profileCompleted ? 'Active' : 'Pending' }}
+                {{ employee.profileCompleted ? "Active" : "Pending" }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {{ formatDate(employee.createdAt) }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-              <button 
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2"
+            >
+              <button
                 (click)="viewEmployeeProfile(employee)"
                 class="text-blue-600 hover:text-blue-900 transition"
                 title="View Profile"
               >
                 <fa-icon [icon]="faEye"></fa-icon>
               </button>
-              <button 
+              <button
                 (click)="openEditModal(employee)"
                 class="text-green-600 hover:text-green-900 transition"
                 title="Edit Employee"
               >
                 <fa-icon [icon]="faEdit"></fa-icon>
               </button>
-              <button 
+              <button
                 (click)="openLeaveHistoryModal(employee)"
                 class="text-purple-600 hover:text-purple-900 transition"
                 title="Leave History"
               >
                 <fa-icon [icon]="faHistory"></fa-icon>
               </button>
-              <button 
+              <button
                 (click)="openResetPasswordModal(employee)"
                 class="text-yellow-600 hover:text-yellow-900 transition"
                 title="Reset Password"
               >
                 <fa-icon [icon]="faKey"></fa-icon>
               </button>
-              <button 
+              <button
                 (click)="openDeleteModal(employee)"
                 class="text-red-600 hover:text-red-900 transition"
                 [class.opacity-50]="employee.role === 'ADMIN'"
                 [class.cursor-not-allowed]="employee.role === 'ADMIN'"
                 [disabled]="employee.role === 'ADMIN'"
-                [title]="employee.role === 'ADMIN' ? 'Cannot delete admin users' : 'Delete Employee'"
+                [title]="
+                  employee.role === 'ADMIN'
+                    ? 'Cannot delete admin users'
+                    : 'Delete Employee'
+                "
               >
                 <fa-icon [icon]="faTrash"></fa-icon>
               </button>
@@ -257,66 +352,120 @@
 </div>
 
 <!-- Add Employee Modal -->
-<div *ngIf="showAddModal" class="fixed inset-0 z-[9999] overflow-y-auto" style="z-index: 9999;"
-     [style.display]="showAddModal ? 'block' : 'none'">
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+<div
+  *ngIf="showAddModal"
+  class="fixed inset-0 z-[9999] overflow-y-auto"
+  style="z-index: 9999"
+  [style.display]="showAddModal ? 'block' : 'none'"
+>
+  <div
+    class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
     <!-- Modal backdrop -->
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" (click)="closeAddModal()"></div>
+    <div
+      class="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
+      (click)="closeAddModal()"
+    ></div>
 
     <!-- Modal dialog -->
-    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative modal-fade-in">
+    <span
+      class="hidden sm:inline-block sm:align-middle sm:h-screen"
+      aria-hidden="true"
+      >&#8203;</span
+    >
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative modal-fade-in"
+    >
       <form [formGroup]="addEmployeeForm" (ngSubmit)="addEmployee()">
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium text-gray-900">Add New Employee</h3>
-            <button type="button" (click)="closeAddModal()" class="text-gray-400 hover:text-gray-600">
+            <button
+              type="button"
+              (click)="closeAddModal()"
+              class="text-gray-400 hover:text-gray-600"
+            >
               <fa-icon [icon]="faTimes"></fa-icon>
             </button>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">First Name *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >First Name *</label
+              >
               <input
                 type="text"
                 formControlName="firstName"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="addEmployeeForm.get('firstName')?.invalid && addEmployeeForm.get('firstName')?.touched"
+                [class.border-red-300]="
+                  addEmployeeForm.get('firstName')?.invalid &&
+                  addEmployeeForm.get('firstName')?.touched
+                "
               />
-              <div *ngIf="addEmployeeForm.get('firstName')?.invalid && addEmployeeForm.get('firstName')?.touched" class="text-red-500 text-xs mt-1">
+              <div
+                *ngIf="
+                  addEmployeeForm.get('firstName')?.invalid &&
+                  addEmployeeForm.get('firstName')?.touched
+                "
+                class="text-red-500 text-xs mt-1"
+              >
                 First name is required
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Last Name *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Last Name *</label
+              >
               <input
                 type="text"
                 formControlName="lastName"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="addEmployeeForm.get('lastName')?.invalid && addEmployeeForm.get('lastName')?.touched"
+                [class.border-red-300]="
+                  addEmployeeForm.get('lastName')?.invalid &&
+                  addEmployeeForm.get('lastName')?.touched
+                "
               />
-              <div *ngIf="addEmployeeForm.get('lastName')?.invalid && addEmployeeForm.get('lastName')?.touched" class="text-red-500 text-xs mt-1">
+              <div
+                *ngIf="
+                  addEmployeeForm.get('lastName')?.invalid &&
+                  addEmployeeForm.get('lastName')?.touched
+                "
+                class="text-red-500 text-xs mt-1"
+              >
                 Last name is required
               </div>
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700">Email *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Email *</label
+              >
               <input
                 type="email"
                 formControlName="email"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="addEmployeeForm.get('email')?.invalid && addEmployeeForm.get('email')?.touched"
+                [class.border-red-300]="
+                  addEmployeeForm.get('email')?.invalid &&
+                  addEmployeeForm.get('email')?.touched
+                "
               />
-              <div *ngIf="addEmployeeForm.get('email')?.invalid && addEmployeeForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+              <div
+                *ngIf="
+                  addEmployeeForm.get('email')?.invalid &&
+                  addEmployeeForm.get('email')?.touched
+                "
+                class="text-red-500 text-xs mt-1"
+              >
                 Valid email is required
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Phone</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Phone</label
+              >
               <input
                 type="tel"
                 formControlName="phone"
@@ -330,15 +479,26 @@
                 type="text"
                 formControlName="cin"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="addEmployeeForm.get('cin')?.invalid && addEmployeeForm.get('cin')?.touched"
+                [class.border-red-300]="
+                  addEmployeeForm.get('cin')?.invalid &&
+                  addEmployeeForm.get('cin')?.touched
+                "
               />
-              <div *ngIf="addEmployeeForm.get('cin')?.invalid && addEmployeeForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
+              <div
+                *ngIf="
+                  addEmployeeForm.get('cin')?.invalid &&
+                  addEmployeeForm.get('cin')?.touched
+                "
+                class="text-red-500 text-xs mt-1"
+              >
                 CIN must contain only numbers
               </div>
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700">Address</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Address</label
+              >
               <textarea
                 formControlName="address"
                 rows="2"
@@ -347,7 +507,9 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Role *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Role *</label
+              >
               <select
                 formControlName="role"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -381,57 +543,93 @@
 </div>
 
 <!-- Edit Employee Modal -->
-<div *ngIf="showEditModal" class="fixed inset-0 z-[9999] overflow-y-auto" style="z-index: 9999;"
-     [style.display]="showEditModal ? 'block' : 'none'">
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+<div
+  *ngIf="showEditModal"
+  class="fixed inset-0 z-[9999] overflow-y-auto"
+  style="z-index: 9999"
+  [style.display]="showEditModal ? 'block' : 'none'"
+>
+  <div
+    class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
     <!-- Modal backdrop -->
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" (click)="closeEditModal()"></div>
+    <div
+      class="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
+      (click)="closeEditModal()"
+    ></div>
 
     <!-- Modal dialog -->
-    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative">
+    <span
+      class="hidden sm:inline-block sm:align-middle sm:h-screen"
+      aria-hidden="true"
+      >&#8203;</span
+    >
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative"
+    >
       <form [formGroup]="editEmployeeForm" (ngSubmit)="updateEmployee()">
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium text-gray-900">Edit Employee</h3>
-            <button type="button" (click)="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+            <button
+              type="button"
+              (click)="closeEditModal()"
+              class="text-gray-400 hover:text-gray-600"
+            >
               <fa-icon [icon]="faTimes"></fa-icon>
             </button>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">First Name *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >First Name *</label
+              >
               <input
                 type="text"
                 formControlName="firstName"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="editEmployeeForm.get('firstName')?.invalid && editEmployeeForm.get('firstName')?.touched"
+                [class.border-red-300]="
+                  editEmployeeForm.get('firstName')?.invalid &&
+                  editEmployeeForm.get('firstName')?.touched
+                "
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Last Name *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Last Name *</label
+              >
               <input
                 type="text"
                 formControlName="lastName"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="editEmployeeForm.get('lastName')?.invalid && editEmployeeForm.get('lastName')?.touched"
+                [class.border-red-300]="
+                  editEmployeeForm.get('lastName')?.invalid &&
+                  editEmployeeForm.get('lastName')?.touched
+                "
               />
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700">Email *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Email *</label
+              >
               <input
                 type="email"
                 formControlName="email"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                [class.border-red-300]="editEmployeeForm.get('email')?.invalid && editEmployeeForm.get('email')?.touched"
+                [class.border-red-300]="
+                  editEmployeeForm.get('email')?.invalid &&
+                  editEmployeeForm.get('email')?.touched
+                "
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Phone</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Phone</label
+              >
               <input
                 type="tel"
                 formControlName="phone"
@@ -449,7 +647,9 @@
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700">Address</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Address</label
+              >
               <textarea
                 formControlName="address"
                 rows="2"
@@ -458,7 +658,9 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Role *</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Role *</label
+              >
               <select
                 formControlName="role"
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -492,45 +694,68 @@
 </div>
 
 <!-- Employee Details Modal -->
-<div *ngIf="showDetailsModal && selectedEmployee" class="fixed inset-0 z-50 overflow-y-auto">
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-    <div class="fixed inset-0 transition-opacity" (click)="closeDetailsModal()">
-      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-    </div>
+<div
+  *ngIf="showDetailsModal && selectedEmployee"
+  class="fixed inset-0 z-50 overflow-y-auto"
+>
+  <div
+    class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <div
+      class="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity"
+      (click)="closeDetailsModal()"
+    ></div>
 
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+    >
       <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-medium text-gray-900">Employee Details</h3>
-          <button (click)="closeDetailsModal()" class="text-gray-400 hover:text-gray-600">
+          <button
+            (click)="closeDetailsModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
             <fa-icon [icon]="faTimes"></fa-icon>
           </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label class="block text-sm font-medium text-gray-500">Full Name</label>
-            <p class="mt-1 text-sm text-gray-900">{{ formatEmployeeName(selectedEmployee) }}</p>
+            <label class="block text-sm font-medium text-gray-500"
+              >Full Name</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ formatEmployeeName(selectedEmployee) }}
+            </p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-500">Employee ID</label>
+            <label class="block text-sm font-medium text-gray-500"
+              >Employee ID</label
+            >
             <p class="mt-1 text-sm text-gray-900">{{ selectedEmployee.id }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-500">Email</label>
-            <p class="mt-1 text-sm text-gray-900">{{ selectedEmployee.email }}</p>
+            <p class="mt-1 text-sm text-gray-900">
+              {{ selectedEmployee.email }}
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-500">Phone</label>
-            <p class="mt-1 text-sm text-gray-900">{{ selectedEmployee.phone || 'Not provided' }}</p>
+            <p class="mt-1 text-sm text-gray-900">
+              {{ selectedEmployee.phone || "Not provided" }}
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-500">CIN</label>
-            <p class="mt-1 text-sm text-gray-900">{{ selectedEmployee.cin || 'Not provided' }}</p>
+            <p class="mt-1 text-sm text-gray-900">
+              {{ selectedEmployee.cin || "Not provided" }}
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-500">Role</label>
-            <span 
+            <span
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1"
               [ngClass]="getRoleClasses(selectedEmployee.role)"
             >
@@ -538,23 +763,31 @@
             </span>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-500">Status</label>
-            <span 
+            <label class="block text-sm font-medium text-gray-500"
+              >Status</label
+            >
+            <span
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1"
               [ngClass]="getStatusClasses(selectedEmployee.profileCompleted)"
             >
-              {{ selectedEmployee.profileCompleted ? 'Active' : 'Pending' }}
+              {{ selectedEmployee.profileCompleted ? "Active" : "Pending" }}
             </span>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-500">Joined Date</label>
-            <p class="mt-1 text-sm text-gray-900">{{ formatDate(selectedEmployee.createdAt) }}</p>
+            <label class="block text-sm font-medium text-gray-500"
+              >Joined Date</label
+            >
+            <p class="mt-1 text-sm text-gray-900">
+              {{ formatDate(selectedEmployee.createdAt) }}
+            </p>
           </div>
         </div>
 
         <div *ngIf="selectedEmployee.address" class="mb-4">
           <label class="block text-sm font-medium text-gray-500">Address</label>
-          <p class="mt-1 text-sm text-gray-900">{{ selectedEmployee.address }}</p>
+          <p class="mt-1 text-sm text-gray-900">
+            {{ selectedEmployee.address }}
+          </p>
         </div>
       </div>
 
@@ -574,7 +807,7 @@
 <div *ngIf="showDeleteModal && selectedEmployee" class="delete-modal-overlay">
   <!-- Modal Backdrop -->
   <div class="delete-modal-backdrop" (click)="closeDeleteModal()"></div>
-  
+
   <!-- Modal Content -->
   <div class="delete-modal-content">
     <!-- Header -->
@@ -584,14 +817,19 @@
       </div>
       <div class="delete-modal-title">
         <h3>Delete Employee</h3>
-        <p>Are you sure you want to delete <strong>{{ formatEmployeeName(selectedEmployee) }}</strong>?</p>
+        <p>
+          Are you sure you want to delete
+          <strong>{{ formatEmployeeName(selectedEmployee) }}</strong
+          >?
+        </p>
       </div>
     </div>
 
     <!-- Warning Box -->
     <div class="delete-modal-warning">
       <p class="warning-text">
-        ⚠️ This action cannot be undone. All associated data will be permanently deleted:
+        ⚠️ This action cannot be undone. All associated data will be permanently
+        deleted:
       </p>
       <ul class="warning-list">
         <li>Leave requests and history</li>
@@ -602,9 +840,7 @@
 
     <!-- Confirmation Input -->
     <div class="delete-modal-input">
-      <label class="input-label">
-        Type <code>DELETE</code> to confirm:
-      </label>
+      <label class="input-label"> Type <code>DELETE</code> to confirm: </label>
       <input
         #confirmInput
         type="text"
@@ -615,7 +851,10 @@
         [class.valid]="isDeleteConfirmationValid()"
         autofocus
       />
-      <p *ngIf="deleteConfirmationText && !isDeleteConfirmationValid()" class="input-error">
+      <p
+        *ngIf="deleteConfirmationText && !isDeleteConfirmationValid()"
+        class="input-error"
+      >
         Please type "DELETE" exactly as shown above.
       </p>
     </div>
@@ -632,8 +871,19 @@
         <span *ngIf="!isDeleting">Delete Employee</span>
         <span *ngIf="isDeleting" class="loading-text">
           <svg class="spinner" viewBox="0 0 24 24">
-            <circle class="spinner-circle" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="spinner-path" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <circle
+              class="spinner-circle"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="spinner-path"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           Deleting...
         </span>
@@ -651,32 +901,51 @@
 </div>
 
 <!-- Reset Password Modal -->
-<div *ngIf="showResetPasswordModal && selectedEmployee" class="fixed inset-0 z-[9999] overflow-y-auto" style="z-index: 9999;"
-     [style.display]="showResetPasswordModal ? 'block' : 'none'">
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-    <div class="fixed inset-0 transition-opacity">
-      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-    </div>
+<div *ngIf="showResetPasswordModal && selectedEmployee" class="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-black/30 px-4">
 
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+  <div
+    class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    
+
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+    >
       <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
         <div class="sm:flex sm:items-start">
-          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
             <fa-icon [icon]="faKey" class="text-yellow-600"></fa-icon>
           </div>
           <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Reset Password</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Reset Password
+            </h3>
             <div class="mt-2">
               <p class="text-sm text-gray-500">
-                Reset password for {{ formatEmployeeName(selectedEmployee) }}? A new temporary password will be generated and sent to their email.
+                Reset password for {{ formatEmployeeName(selectedEmployee) }}? A
+                new temporary password will be generated and sent to their
+                email.
               </p>
-              
-              <div *ngIf="resetPasswordResult" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+
+              <div
+                *ngIf="resetPasswordResult"
+                class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md"
+              >
                 <div class="flex items-center">
-                  <fa-icon [icon]="faCheck" class="text-green-600 mr-2"></fa-icon>
-                  <span class="text-sm text-green-800">New password: <strong>{{ resetPasswordResult }}</strong></span>
+                  <fa-icon
+                    [icon]="faCheck"
+                    class="text-green-600 mr-2"
+                  ></fa-icon>
+                  <span class="text-sm text-green-800"
+                    >New password:
+                    <strong>{{ resetPasswordResult }}</strong></span
+                  >
                 </div>
-                <p class="text-xs text-green-600 mt-1">Password has been sent to the employee's email.</p>
+                <p class="text-xs text-green-600 mt-1">
+                  Password has been sent to the employee's email.
+                </p>
               </div>
             </div>
           </div>
@@ -694,7 +963,7 @@
           (click)="closeResetPasswordModal()"
           class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
         >
-          {{ resetPasswordResult ? 'Close' : 'Cancel' }}
+          {{ resetPasswordResult ? "Close" : "Cancel" }}
         </button>
       </div>
     </div>
@@ -702,60 +971,86 @@
 </div>
 
 <!-- Leave History Modal -->
-<div *ngIf="showLeaveHistoryModal && selectedEmployee" class="fixed inset-0 z-[9999] overflow-y-auto" style="z-index: 9999;"
-     [style.display]="showLeaveHistoryModal ? 'block' : 'none'">
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-    <div class="fixed inset-0 transition-opacity" (click)="closeLeaveHistoryModal()">
-      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-    </div>
+<div
+  *ngIf="showLeaveHistoryModal && selectedEmployee"
+  class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 px-4"
+>
+  <div class="absolute inset-0" (click)="closeLeaveHistoryModal()"></div>
 
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-medium text-gray-900">Leave History - {{ formatEmployeeName(selectedEmployee) }}</h3>
-          <button (click)="closeLeaveHistoryModal()" class="text-gray-400 hover:text-gray-600">
-            <fa-icon [icon]="faTimes"></fa-icon>
-          </button>
-        </div>
+  <div
+    class="relative bg-white rounded-lg shadow-xl transition-all w-full max-w-4xl z-50 overflow-y-auto max-h-[90vh]"
+  >
+    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900">
+          Leave History - {{ formatEmployeeName(selectedEmployee) }}
+        </h3>
+        <button
+          (click)="closeLeaveHistoryModal()"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <fa-icon [icon]="faTimes"></fa-icon>
+        </button>
+      </div>
 
-        <div *ngIf="leaveHistory.length === 0" class="text-center py-8">
-          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
-          <p class="text-gray-500">No leave history found for this employee.</p>
-        </div>
+      <div *ngIf="leaveHistory.length === 0" class="text-center py-8">
+        <svg
+          class="w-16 h-16 text-gray-300 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          ></path>
+        </svg>
+        <p class="text-gray-500">No leave history found for this employee.</p>
+      </div>
 
-        <div *ngIf="leaveHistory.length > 0" class="space-y-4 max-h-96 overflow-y-auto">
-          <div *ngFor="let request of leaveHistory" class="border border-gray-200 rounded-lg p-4">
-            <div class="flex justify-between items-start mb-2">
-              <div>
-                <h4 class="font-medium text-gray-900">{{ request.type }}</h4>
-                <p class="text-sm text-gray-600">{{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}</p>
-              </div>
-              <span 
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                [ngClass]="getLeaveStatusClasses(request.status)"
-              >
-                {{ request.status }}
-              </span>
+      <div
+        *ngIf="leaveHistory.length > 0"
+        class="space-y-4 max-h-96 overflow-y-auto"
+      >
+        <div
+          *ngFor="let request of leaveHistory"
+          class="border border-gray-200 rounded-lg p-4"
+        >
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h4 class="font-medium text-gray-900">{{ request.type }}</h4>
+              <p class="text-sm text-gray-600">
+                {{ formatDate(request.startDate) }} -
+                {{ formatDate(request.endDate) }}
+              </p>
             </div>
-            <div class="text-sm text-gray-600">
-              <p><strong>Duration:</strong> {{ calculateDaysText(request) }}</p>
-              <p><strong>Reason:</strong> {{ request.reason }}</p>
-              <p *ngIf="request.adminRemark"><strong>Admin Remark:</strong> {{ request.adminRemark }}</p>
-            </div>
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+              [ngClass]="getLeaveStatusClasses(request.status)"
+            >
+              {{ request.status }}
+            </span>
+          </div>
+          <div class="text-sm text-gray-600">
+            <p><strong>Duration:</strong> {{ calculateDaysText(request) }}</p>
+            <p><strong>Reason:</strong> {{ request.reason }}</p>
+            <p *ngIf="request.adminRemark">
+              <strong>Admin Remark:</strong> {{ request.adminRemark }}
+            </p>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-        <button
-          (click)="closeLeaveHistoryModal()"
-          class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-        >
-          Close
-        </button>
-      </div>
+    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+      <button
+        (click)="closeLeaveHistoryModal()"
+        class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+      >
+        Close
+      </button>
     </div>
   </div>
 </div>
