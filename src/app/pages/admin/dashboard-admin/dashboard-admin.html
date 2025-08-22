@@ -163,23 +163,18 @@
           
           <div class="flex flex-col gap-2 ml-4">
             <button 
-              (click)="quickApproveRequest(request)"
+            (click)="openApproveModal(request)"
               class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition"
             >
               Approve
             </button>
             <button 
-              (click)="quickRejectRequest(request)"
+            (click)="openRejectModal(request)"
               class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition"
             >
               Reject
             </button>
-            <button 
-              (click)="viewRequestDetails(request)"
-              class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition"
-            >
-              View
-            </button>
+          
           </div>
         </div>
 
@@ -265,6 +260,180 @@
             <p class="text-sm text-gray-500">No recent requests</p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showRejectModal" class="fixed inset-0 z-[9990]">
+  <!-- Backdrop -->
+  <div
+    class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity"
+    (click)="closeRejectModal()"
+  ></div>
+
+  <!-- Panel wrapper (centers the modal) -->
+  <div class="relative z-[9991] min-h-screen flex items-center justify-center p-4">
+    <!-- Modal panel -->
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reject-title"
+      tabindex="-1"
+      class="modal-panel w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/5
+             transition-all duration-200 transform
+             animate-[fadeIn_.2s_ease-out,slideInUp_.2s_ease-out]"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="px-6 pt-6 pb-3 flex items-center gap-3">
+        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-red-100">
+          <fa-icon [icon]="faTimesCircle" class="text-red-600"></fa-icon>
+        </div>
+        <h3 id="reject-title" class="text-lg font-semibold text-gray-900">
+          Reject Leave Request
+        </h3>
+      </div>
+
+      <!-- Body -->
+      <div class="px-6 pb-4">
+        <p class="text-sm text-gray-600">
+          You’re rejecting
+          <span class="font-medium text-gray-800">
+            {{ selectedRequest?.employeeName || 'this employee' }}
+          </span>’s request. Please provide a clear reason.
+        </p>
+
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">
+            Reason for Rejection <span class="text-red-600">*</span>
+          </label>
+          <textarea
+            [(ngModel)]="rejectReason"
+            rows="4"
+            required
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-red-500"
+            placeholder="E.g. Overlaps with mandatory team meeting; insufficient balance; missing supporting document..."
+          ></textarea>
+          <p class="mt-1 text-xs text-gray-500">This reason will be shared with the employee.</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 pb-6 pt-3 bg-gray-50 flex flex-col sm:flex-row-reverse gap-3">
+        <button
+          (click)="confirmReject()"
+          [disabled]="isProcessing || !rejectReason?.trim()"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-white bg-red-600 hover:bg-red-700 focus:outline-none
+                 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          <span *ngIf="!isProcessing">Reject Request</span>
+          <span *ngIf="isProcessing" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing...
+          </span>
+        </button>
+
+        <button
+          (click)="closeRejectModal()"
+          [disabled]="isProcessing"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
+                 border border-gray-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Approve Modal -->
+<div *ngIf="showApproveModal" class="fixed inset-0 z-[9990]">
+  <!-- Backdrop (blur the page behind, not the modal) -->
+  <div
+    class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity"
+    (click)="closeApproveModal()"
+  ></div>
+
+  <!-- Centering wrapper -->
+  <div class="relative z-[9991] min-h-screen flex items-center justify-center p-4">
+    <!-- Panel -->
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="approve-title"
+      tabindex="-1"
+      class="modal-panel w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/5
+             transition-all duration-200 transform
+             animate-[fadeIn_.2s_ease-out,slideInUp_.2s_ease-out]"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="px-6 pt-6 pb-3 flex items-center gap-3">
+        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
+          <fa-icon [icon]="faCheckCircle" class="text-green-600"></fa-icon>
+        </div>
+        <h3 id="approve-title" class="text-lg font-semibold text-gray-900">
+          Approve Leave Request
+        </h3>
+      </div>
+
+      <!-- Body -->
+      <div class="px-6 pb-4">
+        <p class="text-sm text-gray-600">
+          Approve
+          <span class="font-medium text-gray-800">
+            {{ selectedRequest?.employeeName || 'this employee' }}
+          </span>’s request?
+        </p>
+
+        <!-- Optional note (uncomment if you need it) -->
+        <!--
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">Note (optional)</label>
+          <input
+            [(ngModel)]="approveNote"
+            type="text"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="e.g. Approved as per policy"
+          />
+        </div>
+        -->
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 pb-6 pt-3 bg-gray-50 flex flex-col sm:flex-row-reverse gap-3">
+        <button
+          (click)="confirmApprove()"
+          [disabled]="isProcessing"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-white bg-green-600 hover:bg-green-700 focus:outline-none
+                 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          <span *ngIf="!isProcessing">Approve</span>
+          <span *ngIf="isProcessing" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing...
+          </span>
+        </button>
+
+        <button
+          (click)="closeApproveModal()"
+          [disabled]="isProcessing"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
+                 border border-gray-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   </div>

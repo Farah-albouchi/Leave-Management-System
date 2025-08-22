@@ -177,14 +177,14 @@
               
               <!-- Approve (only for pending) -->
               <button 
-                *ngIf="request.status === LeaveStatus.PENDING"
-                (click)="approveRequest(request)"
-                class="text-green-600 hover:text-green-900 transition"
-                title="Approve"
-                [disabled]="isProcessing"
-              >
-                <fa-icon [icon]="faCheckCircle"></fa-icon>
-              </button>
+              *ngIf="request.status === LeaveStatus.PENDING"
+              (click)="openApproveModal(request)"
+              class="text-green-600 hover:text-green-900 transition"
+              title="Approve"
+              [disabled]="isProcessing"
+            >
+              <fa-icon [icon]="faCheckCircle"></fa-icon>
+            </button>
               
               <!-- Reject (only for pending) -->
               <button 
@@ -204,8 +204,10 @@
   </div>
 </div>
 
+
+
 <!-- Request Details Modal -->
-<div *ngIf="showRequestModal" class="fixed inset-0 z-50 overflow-y-auto">
+<div *ngIf="showRequestModal"  class="fixed inset-0 backdrop-blur-sm bg-black/30 transition-opacity">
   <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
     <div class="fixed inset-0 transition-opacity" (click)="closeRequestModal()">
      
@@ -301,44 +303,70 @@
 </div>
 
 <!-- Reject Modal -->
-<div *ngIf="showRejectModal" class="fixed inset-0 z-50 overflow-y-auto">
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-    <div class="fixed inset-0 transition-opacity" (click)="closeRejectModal()">
-      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-    </div>
+<!-- Reject Modal -->
+<div *ngIf="showRejectModal" class="fixed inset-0 z-[9990]">
+  <!-- Backdrop -->
+  <div
+    class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity"
+    (click)="closeRejectModal()"
+  ></div>
 
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-        <div class="sm:flex sm:items-start">
-          <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-            <fa-icon [icon]="faTimesCircle" class="text-red-600"></fa-icon>
-          </div>
-          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Reject Leave Request</h3>
-            <div class="mt-2">
-              <p class="text-sm text-gray-500">
-                Are you sure you want to reject {{ selectedRequest?.employeeName || 'this employee' }}'s leave request?
-              </p>
-            </div>
-            <div class="mt-4">
-              <label class="block text-sm font-medium text-gray-700">Reason for Rejection *</label>
-              <textarea
-                [(ngModel)]="rejectReason"
-                rows="3"
-                required
-                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                placeholder="Please provide a reason for rejection..."
-              ></textarea>
-              <p class="mt-1 text-xs text-gray-500">This reason will be shared with the employee.</p>
-            </div>
-          </div>
+  <!-- Panel wrapper (centers the modal) -->
+  <div class="relative z-[9991] min-h-screen flex items-center justify-center p-4">
+    <!-- Modal panel -->
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reject-title"
+      tabindex="-1"
+      class="modal-panel w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/5
+             transition-all duration-200 transform
+             animate-[fadeIn_.2s_ease-out,slideInUp_.2s_ease-out]"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="px-6 pt-6 pb-3 flex items-center gap-3">
+        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-red-100">
+          <fa-icon [icon]="faTimesCircle" class="text-red-600"></fa-icon>
+        </div>
+        <h3 id="reject-title" class="text-lg font-semibold text-gray-900">
+          Reject Leave Request
+        </h3>
+      </div>
+
+      <!-- Body -->
+      <div class="px-6 pb-4">
+        <p class="text-sm text-gray-600">
+          You’re rejecting
+          <span class="font-medium text-gray-800">
+            {{ selectedRequest?.employeeName || 'this employee' }}
+          </span>’s request. Please provide a clear reason.
+        </p>
+
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">
+            Reason for Rejection <span class="text-red-600">*</span>
+          </label>
+          <textarea
+            [(ngModel)]="rejectReason"
+            rows="4"
+            required
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-red-500"
+            placeholder="E.g. Overlaps with mandatory team meeting; insufficient balance; missing supporting document..."
+          ></textarea>
+          <p class="mt-1 text-xs text-gray-500">This reason will be shared with the employee.</p>
         </div>
       </div>
-      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+
+      <!-- Footer -->
+      <div class="px-6 pb-6 pt-3 bg-gray-50 flex flex-col sm:flex-row-reverse gap-3">
         <button
           (click)="confirmReject()"
-          [disabled]="isProcessing || !rejectReason.trim()"
-          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none disabled:opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
+          [disabled]="isProcessing || !rejectReason?.trim()"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-white bg-red-600 hover:bg-red-700 focus:outline-none
+                 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           <span *ngIf="!isProcessing">Reject Request</span>
           <span *ngIf="isProcessing" class="flex items-center">
@@ -349,10 +377,100 @@
             Processing...
           </span>
         </button>
+
         <button
           (click)="closeRejectModal()"
           [disabled]="isProcessing"
-          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none disabled:opacity-50 sm:mt-0 sm:w-auto sm:text-sm"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
+                 border border-gray-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Approve Modal -->
+<div *ngIf="showApproveModal" class="fixed inset-0 z-[9990]">
+  <!-- Backdrop (blur the page behind, not the modal) -->
+  <div
+    class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity"
+    (click)="closeApproveModal()"
+  ></div>
+
+  <!-- Centering wrapper -->
+  <div class="relative z-[9991] min-h-screen flex items-center justify-center p-4">
+    <!-- Panel -->
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="approve-title"
+      tabindex="-1"
+      class="modal-panel w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/5
+             transition-all duration-200 transform
+             animate-[fadeIn_.2s_ease-out,slideInUp_.2s_ease-out]"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="px-6 pt-6 pb-3 flex items-center gap-3">
+        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
+          <fa-icon [icon]="faCheckCircle" class="text-green-600"></fa-icon>
+        </div>
+        <h3 id="approve-title" class="text-lg font-semibold text-gray-900">
+          Approve Leave Request
+        </h3>
+      </div>
+
+      <!-- Body -->
+      <div class="px-6 pb-4">
+        <p class="text-sm text-gray-600">
+          Approve
+          <span class="font-medium text-gray-800">
+            {{ selectedRequest?.employeeName || 'this employee' }}
+          </span>’s request?
+        </p>
+
+        <!-- Optional note (uncomment if you need it) -->
+        <!--
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">Note (optional)</label>
+          <input
+            [(ngModel)]="approveNote"
+            type="text"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="e.g. Approved as per policy"
+          />
+        </div>
+        -->
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 pb-6 pt-3 bg-gray-50 flex flex-col sm:flex-row-reverse gap-3">
+        <button
+          (click)="confirmApprove()"
+          [disabled]="isProcessing"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-white bg-green-600 hover:bg-green-700 focus:outline-none
+                 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          <span *ngIf="!isProcessing">Approve</span>
+          <span *ngIf="isProcessing" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing...
+          </span>
+        </button>
+
+        <button
+          (click)="closeApproveModal()"
+          [disabled]="isProcessing"
+          class="inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium
+                 text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
+                 border border-gray-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

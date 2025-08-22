@@ -5,19 +5,21 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Card } from '../../../components/card/card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCalendar, faClock, faClipboard, faCheckCircle, faRectangleXmark, faChartBar, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faClock, faClipboard, faCheckCircle, faRectangleXmark, faChartBar, faUser , faTimesCircle  } from '@fortawesome/free-regular-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { DashboardService, AdminDashboardStats } from '../../../services/dashboard.service';
 import { LeaveRequestService } from '../../../services/leave-request.service';
 import { LeaveRequestResponseDto, LeaveStatus } from '../../../models/leave-request.models';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard-admin',
-  imports: [CommonModule, FontAwesomeModule, Card],
+  imports: [FormsModule,CommonModule, FontAwesomeModule, Card],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css'
 })
 export class DashboardAdmin implements OnInit, OnDestroy {
+    faTimesCircle = faTimesCircle;
   faPlus = faPlus;
   faCalendar = faCalendar;
   faClock = faClock;
@@ -42,11 +44,61 @@ export class DashboardAdmin implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+  showRequestModal = false;
+showRejectModal = false;
+showApproveModal = false;        // ✅ NEW
+selectedRequest: LeaveRequestResponseDto | null = null;
+rejectReason = '';
+rejectError = '';
+rejectMin = 8;     // min chars to consider the reason meaningful
+rejectMax = 300; 
+isProcessing = false;
   constructor(
     private dashboardService: DashboardService,
     private leaveRequestService: LeaveRequestService,
     private router: Router
   ) {}
+openApproveModal(request: LeaveRequestResponseDto): void {
+  this.selectedRequest = request;
+  // this.approveNote = ''; // optional
+  this.showApproveModal = true;
+}
+
+closeApproveModal(): void {
+  this.showApproveModal = false;
+  // this.approveNote = ''; // optional
+  this.selectedRequest = null;
+}
+
+confirmApprove(): void {
+  if (!this.selectedRequest || this.isProcessing) return;
+
+  this.isProcessing = true;
+
+  this.leaveRequestService.updateRequestStatus(
+      this.selectedRequest.id,
+      LeaveStatus.ACCEPTED
+      // , this.approveNote // optional if your API supports an approval note
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.closeApproveModal();
+        this.isProcessing = false;
+
+      },
+      error: (error) => {
+        console.error('Error approving request:', error);
+        this.errorMessage = 'Failed to approve request. Please try again.';
+        this.isProcessing = false;
+      }
+    });
+}
+// Old approveRequest: replace with this to route through modal
+approveRequest(request: LeaveRequestResponseDto): void {
+  if (this.isProcessing) return;
+  this.openApproveModal(request);
+}
 
   ngOnInit(): void {
     this.loadAdminDashboard();
@@ -76,6 +128,75 @@ export class DashboardAdmin implements OnInit, OnDestroy {
 
     // Load pending requests
     this.loadPendingRequests();
+  }
+  openRejectModal(request: LeaveRequestResponseDto): void {
+    this.selectedRequest = request;
+    this.rejectReason = '';
+    this.showRejectModal = true;
+  }
+
+  closeRejectModal(): void {
+    this.showRejectModal = false;
+    this.selectedRequest = null;
+    this.rejectReason = '';
+  }
+  onRejectInput(): void {
+    const len = this.rejectReason.trim().length;
+    if (len === 0) {
+      this.rejectError = 'Reason is required.';
+    } else if (len < this.rejectMin) {
+      this.rejectError = `Please provide at least ${this.rejectMin} characters.`;
+    } else if (len > this.rejectMax) {
+      this.rejectError = `Reason must be at most ${this.rejectMax} characters.`;
+    } else {
+      this.rejectError = '';
+    }
+  }
+  
+  isRejectValid(): boolean {
+    const len = this.rejectReason.trim().length;
+    return len >= this.rejectMin && len <= this.rejectMax;
+  }
+  
+  appendRejectChip(text: string): void {
+    // Smart append with spacing
+    if (!this.rejectReason) this.rejectReason = text;
+    else this.rejectReason = (this.rejectReason.trimEnd() + (this.rejectReason.endsWith('.') ? ' ' : '. ') + text);
+    this.onRejectInput();
+  }
+  
+
+  // Reject with reason
+  confirmReject(): void {
+    if (!this.selectedRequest || !this.rejectReason.trim() || this.isProcessing) return;
+
+    this.isProcessing = true;
+
+    this.leaveRequestService.updateRequestStatus(this.selectedRequest.id, LeaveStatus.REJECTED, this.rejectReason)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Request rejected successfully');
+          this.closeRejectModal();
+          this.isProcessing = false;
+        },
+        error: (error) => {
+          console.error('Error rejecting request:', error);
+          this.errorMessage = 'Failed to reject request. Please try again.';
+          this.isProcessing = false;
+        }
+      });
+  }
+
+  // Modal methods
+  openRequestModal(request: LeaveRequestResponseDto): void {
+    this.selectedRequest = request;
+    this.showRequestModal = true;
+  }
+
+  closeRequestModal(): void {
+    this.showRequestModal = false;
+    this.selectedRequest = null;
   }
 
   private loadPendingRequests(): void {

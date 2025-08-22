@@ -21,6 +21,18 @@ export class ManageRequests implements OnInit, OnDestroy {
   faTimesCircle = faTimesCircle;
   faEye = faEye;
   faRefresh = faRefresh;
+  // Modal properties
+showRequestModal = false;
+showRejectModal = false;
+showApproveModal = false;        // ✅ NEW
+selectedRequest: LeaveRequestResponseDto | null = null;
+rejectReason = '';
+// approveNote = '';            // Optional if you keep the note input
+isProcessing = false;
+
+rejectError = '';
+rejectMin = 8;     // min chars to consider the reason meaningful
+rejectMax = 300;   // max length to keep it concise
 
   // Filter properties
   searchTerm = '';
@@ -32,14 +44,52 @@ export class ManageRequests implements OnInit, OnDestroy {
   errorMessage = '';
 
   // Modal properties
-  showRequestModal = false;
-  showRejectModal = false;
-  selectedRequest: LeaveRequestResponseDto | null = null;
-  rejectReason = '';
-  isProcessing = false;
+
 
   // Enums for template
   LeaveStatus = LeaveStatus;
+// Approve modal handlers
+openApproveModal(request: LeaveRequestResponseDto): void {
+  this.selectedRequest = request;
+  // this.approveNote = ''; // optional
+  this.showApproveModal = true;
+}
+
+closeApproveModal(): void {
+  this.showApproveModal = false;
+  // this.approveNote = ''; // optional
+  this.selectedRequest = null;
+}
+
+confirmApprove(): void {
+  if (!this.selectedRequest || this.isProcessing) return;
+
+  this.isProcessing = true;
+
+  this.leaveRequestService.updateRequestStatus(
+      this.selectedRequest.id,
+      LeaveStatus.ACCEPTED
+      // , this.approveNote // optional if your API supports an approval note
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.closeApproveModal();
+        this.isProcessing = false;
+        this.refreshData();
+      },
+      error: (error) => {
+        console.error('Error approving request:', error);
+        this.errorMessage = 'Failed to approve request. Please try again.';
+        this.isProcessing = false;
+      }
+    });
+}
+// Old approveRequest: replace with this to route through modal
+approveRequest(request: LeaveRequestResponseDto): void {
+  if (this.isProcessing) return;
+  this.openApproveModal(request);
+}
 
   private destroy$ = new Subject<void>();
 
@@ -111,31 +161,7 @@ export class ManageRequests implements OnInit, OnDestroy {
     this.loadRequests();
   }
 
-  // Simple approve action
-  approveRequest(request: LeaveRequestResponseDto): void {
-    if (this.isProcessing) return;
-    
-    if (!confirm(`Are you sure you want to approve ${request.employeeName || 'this employee'}'s leave request?`)) {
-      return;
-    }
 
-    this.isProcessing = true;
-    
-    this.leaveRequestService.updateRequestStatus(request.id, LeaveStatus.ACCEPTED)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          console.log('Request approved successfully');
-          this.isProcessing = false;
-          this.refreshData();
-        },
-        error: (error) => {
-          console.error('Error approving request:', error);
-          this.errorMessage = 'Failed to approve request. Please try again.';
-          this.isProcessing = false;
-        }
-      });
-  }
 
   // Open reject modal
   openRejectModal(request: LeaveRequestResponseDto): void {
@@ -149,6 +175,31 @@ export class ManageRequests implements OnInit, OnDestroy {
     this.selectedRequest = null;
     this.rejectReason = '';
   }
+  onRejectInput(): void {
+    const len = this.rejectReason.trim().length;
+    if (len === 0) {
+      this.rejectError = 'Reason is required.';
+    } else if (len < this.rejectMin) {
+      this.rejectError = `Please provide at least ${this.rejectMin} characters.`;
+    } else if (len > this.rejectMax) {
+      this.rejectError = `Reason must be at most ${this.rejectMax} characters.`;
+    } else {
+      this.rejectError = '';
+    }
+  }
+  
+  isRejectValid(): boolean {
+    const len = this.rejectReason.trim().length;
+    return len >= this.rejectMin && len <= this.rejectMax;
+  }
+  
+  appendRejectChip(text: string): void {
+    // Smart append with spacing
+    if (!this.rejectReason) this.rejectReason = text;
+    else this.rejectReason = (this.rejectReason.trimEnd() + (this.rejectReason.endsWith('.') ? ' ' : '. ') + text);
+    this.onRejectInput();
+  }
+  
 
   // Reject with reason
   confirmReject(): void {
