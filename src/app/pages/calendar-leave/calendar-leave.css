@@ -9,4 +9,39 @@
     color: #0f172a !important;
     border-radius: 9999px;
   }
+
+  /* Enhanced Calendar Styles for Date Selection */
+
+  /* Selected date styles */
+  .calendar-day-selected {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    color: white !important;
+    border: 2px solid #1d4ed8 !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    transform: scale(1.02);
+  }
+
+  /* Hover effects for selectable days */
+  .calendar-day-selectable:hover {
+    background: rgba(59, 130, 246, 0.05) !important;
+    border: 1px solid #3b82f6;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Approved leave day styles */
+  .calendar-day-approved:hover {
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+    transform: scale(1.01);
+  }
+
+  /* Animation for date selection */
+  @keyframes dateSelect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1.02); }
+  }
+
+  .calendar-day-selected {
+    animation: dateSelect 0.2s ease-out;
+  }
   

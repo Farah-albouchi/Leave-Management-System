@@ -1,0 +1,148 @@
+<!-- Modal Backdrop -->
+<div 
+  *ngIf="isVisible" 
+  class="modal-backdrop"
+  (click)="onBackdropClick($event)"
+>
+  <!-- Modal Content -->
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <fa-icon [icon]="faCalendarAlt" class="title-icon"></fa-icon>
+        Leave Request Details
+      </h2>
+      <button 
+        type="button" 
+        class="close-button"
+        (click)="onCloseModal()"
+        aria-label="Close modal"
+      >
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body" *ngIf="leaveRequest">
+      <!-- Status Badge -->
+      <div class="status-section">
+        <div class="status-badge" [ngClass]="getStatusClass()">
+          <fa-icon [icon]="getStatusIcon()" class="status-icon"></fa-icon>
+          <span class="status-text">{{ leaveRequest.status | titlecase }}</span>
+        </div>
+      </div>
+
+      <!-- Leave Details Grid -->
+      <div class="details-grid">
+        <!-- Leave Type -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <fa-icon [icon]="faCalendarAlt" class="detail-icon"></fa-icon>
+            Leave Type
+          </label>
+          <p class="detail-value">{{ leaveRequest.type }}</p>
+        </div>
+
+        <!-- Duration -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <fa-icon [icon]="faClock" class="detail-icon"></fa-icon>
+            Duration
+          </label>
+          <p class="detail-value">
+            {{ calculateDuration() }} 
+            {{ calculateDuration() === 1 ? 'day' : 'days' }}
+            <span *ngIf="leaveRequest.halfDay" class="half-day-badge">Half Day</span>
+          </p>
+        </div>
+
+        <!-- Start Date -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <fa-icon [icon]="faCalendarAlt" class="detail-icon"></fa-icon>
+            Start Date
+          </label>
+          <p class="detail-value">{{ formatDate(leaveRequest.startDate) }}</p>
+        </div>
+
+        <!-- End Date -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <fa-icon [icon]="faCalendarAlt" class="detail-icon"></fa-icon>
+            End Date
+          </label>
+          <p class="detail-value">{{ formatDate(leaveRequest.endDate) }}</p>
+        </div>
+
+        <!-- Submitted Date -->
+        <!-- <div class="detail-item">
+          <label class="detail-label">
+            <fa-icon [icon]="faClock" class="detail-icon"></fa-icon>
+            Submitted
+          </label>
+          <p class="detail-value">{{ formatDate(leaveRequest.submittedAt) }}</p>
+        </div> -->
+
+        <!-- Admin Response Date (if available) -->
+        <!-- <div class="detail-item" *ngIf="leaveRequest.adminResponseAt">
+          <label class="detail-label">
+            <fa-icon [icon]="faUser" class="detail-icon"></fa-icon>
+            Reviewed
+          </label>
+          <p class="detail-value">{{ formatDate(leaveRequest.adminResponseAt) }}</p>
+        </div>
+      </div> -->
+
+      <!-- Reason Section -->
+      <div class="reason-section">
+        <label class="detail-label">
+          <fa-icon [icon]="faFileAlt" class="detail-icon"></fa-icon>
+          Reason
+        </label>
+        <div class="reason-content">
+          <p class="reason-text">{{ leaveRequest.reason }}</p>
+        </div>
+      </div>
+
+      <!-- Admin Comment (if available) -->
+      <!-- <div class="admin-comment-section" *ngIf="leaveRequest.adminComment">
+        <label class="detail-label">
+          <fa-icon [icon]="faUser" class="detail-icon"></fa-icon>
+          Admin Comment
+        </label>
+        <div class="admin-comment-content">
+          <p class="admin-comment-text">{{ leaveRequest.adminComment }}</p>
+        </div>
+      </div> -->
+
+      <!-- Document Section (if available) -->
+      <div class="document-section" *ngIf="leaveRequest.documentPath">
+        <label class="detail-label">
+          <fa-icon [icon]="faFileAlt" class="detail-icon"></fa-icon>
+          Supporting Document
+        </label>
+        <div class="document-content">
+          <button 
+            type="button" 
+            class="download-button"
+            (click)="downloadDocument()"
+          >
+            <fa-icon [icon]="faDownload" class="download-icon"></fa-icon>
+            Download Document
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="close-footer-button"
+        (click)="onCloseModal()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LeaveRequestService } from '../../services/leave-request.service';
-import { LeaveRequestCreateDto, LeaveType } from '../../models/leave-request.models';
+import { CalendarStateService } from '../../services/calendar-state.service';
+import { LeaveRequestCreateDto, LeaveType, LeaveStatus } from '../../models/leave-request.models';
 
 @Component({
   standalone: true,
@@ -24,17 +25,20 @@ export class ApplyLeave implements OnInit, OnDestroy {
   successMessage = '';
   fileError = '';
   dateError = '';
+  prefilledFromCalendar = false;
   
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private leaveRequestService: LeaveRequestService,
+    private calendarStateService: CalendarStateService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
+    this.checkForPrefilledDates();
   }
 
   ngOnDestroy(): void {
@@ -63,6 +67,77 @@ export class ApplyLeave implements OnInit, OnDestroy {
     this.leaveForm.get('halfDay')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.calculateWorkingDays());
+  }
+
+  private checkForPrefilledDates(): void {
+    // Check for dates from router state (navigation from calendar)
+    const navigation = this.router.getCurrentNavigation();
+    const routerState = navigation?.extras?.state;
+    
+    if (routerState?.['prefillDates']) {
+      const prefillDates = routerState['prefillDates'];
+      this.prefillDates(prefillDates.startDate, prefillDates.endDate);
+      this.prefilledFromCalendar = true;
+      return;
+    }
+
+    // Check calendar state service for selected dates
+    const selectedRange = this.calendarStateService.getSelectedDateRange();
+    if (selectedRange.startDate) {
+      this.prefillDates(selectedRange.startDate, selectedRange.endDate || selectedRange.startDate);
+      this.prefilledFromCalendar = true;
+    }
+  }
+
+  private prefillDates(startDate: Date, endDate: Date): void {
+    // Format dates for input fields (YYYY-MM-DD)
+    const formatDateForInput = (date: Date): string => {
+      return date.toISOString().split('T')[0];
+    };
+
+    // Check for conflicts before prefilling
+    if (this.hasConflictWithApprovedLeave(startDate, endDate)) {
+      this.errorMessage = 'The selected dates conflict with existing approved leave. Please choose different dates.';
+      return;
+    }
+
+    this.leaveForm.patchValue({
+      startDate: formatDateForInput(startDate),
+      endDate: formatDateForInput(endDate)
+    });
+
+    // Calculate working days after prefilling
+    setTimeout(() => {
+      this.calculateWorkingDays();
+    }, 100);
+
+    this.successMessage = `Dates prefilled from calendar: ${this.formatDisplayDate(startDate)} to ${this.formatDisplayDate(endDate)}`;
+  }
+
+  private hasConflictWithApprovedLeave(startDate: Date, endDate: Date): boolean {
+    // This would ideally call a service to check for conflicts
+    // For now, we'll return false and let the backend handle validation
+    return false;
+  }
+
+  private formatDisplayDate(date: Date): string {
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  }
+
+  clearPrefilledDates(): void {
+    this.leaveForm.patchValue({
+      startDate: '',
+      endDate: ''
+    });
+    this.prefilledFromCalendar = false;
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.calendarStateService.clearSelectedDateRange();
+    this.calculateWorkingDays();
   }
 
   calculateWorkingDays(): void {

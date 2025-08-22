@@ -8,12 +8,19 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DashboardService } from '../../services/dashboard.service';
 import { LeaveRequestService } from '../../services/leave-request.service';
+import { CalendarStateService } from '../../services/calendar-state.service';
 import { LeaveRequestResponseDto, LeaveStatus } from '../../models/leave-request.models';
+import { LeaveDetailsModal } from '../../components/leave-details-modal/leave-details-modal';
 
 interface CalendarDay {
   date: Date;
   isOtherMonth: boolean;
   leaveRequests: CalendarLeaveRequest[];
+  isSelected?: boolean;
+  isSelectionStart?: boolean;
+  isSelectionEnd?: boolean;
+  isInSelectedRange?: boolean;
+  hasApprovedLeave?: boolean;
 }
 
 interface CalendarLeaveRequest {
@@ -32,7 +39,8 @@ interface CalendarLeaveRequest {
   imports: [
     CommonModule,
     DatePipe,
-    CalendarModule
+    CalendarModule,
+    LeaveDetailsModal
   ],
   templateUrl: './calendar-leave.html',
   styleUrls: ['./calendar-leave.css']
@@ -49,6 +57,13 @@ export class CalendarLeave implements OnInit, OnDestroy {
   
   isLoading = true;
   errorMessage = '';
+  conflictMessage = '';
+
+  // Date selection state
+  selectionStartDate: Date | null = null;
+  isSelectingRange = false;
+  selectedLeaveRequest: LeaveRequestResponseDto | null = null;
+  showLeaveDetailsModal = false;
 
   // Make LeaveStatus enum available in template
   LeaveStatus = LeaveStatus;
@@ -58,6 +73,7 @@ export class CalendarLeave implements OnInit, OnDestroy {
   constructor(
     private dashboardService: DashboardService,
     private leaveRequestService: LeaveRequestService,
+    private calendarStateService: CalendarStateService,
     private router: Router
   ) {}
 
@@ -132,6 +148,9 @@ export class CalendarLeave implements OnInit, OnDestroy {
     }
 
     this.calendarDays = days;
+    
+    // Update selection visual state
+    this.updateCalendarSelection();
   }
 
   private getLeaveRequestsForDate(date: Date): CalendarLeaveRequest[] {
@@ -245,17 +264,140 @@ export class CalendarLeave implements OnInit, OnDestroy {
   }
 
   navigateToApplyLeave(): void {
-    this.router.navigate(['/ApplyLeave']);
+    // Navigate with selected dates if any
+    const selectedRange = this.calendarStateService.getSelectedDateRange();
+    if (selectedRange.startDate) {
+      this.router.navigate(['/ApplyLeave'], {
+        state: { 
+          prefillDates: {
+            startDate: selectedRange.startDate,
+            endDate: selectedRange.endDate || selectedRange.startDate
+          }
+        }
+      });
+    } else {
+      this.router.navigate(['/ApplyLeave']);
+    }
   }
 
-  onDateClick(day: CalendarDay): void {
-    if (day.leaveRequests.length > 0) {
-      // Show details or navigate to request details
-      const request = day.leaveRequests[0];
-      this.router.navigate(['/myRequests'], { 
-        queryParams: { requestId: request.id } 
-      });
+  onDateClick(day: CalendarDay, event?: MouseEvent): void {
+    // Prevent default behavior
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
     }
+
+    // If clicking on a day with approved leave, show details modal
+    const approvedLeave = day.leaveRequests.find(req => req.status === LeaveStatus.ACCEPTED);
+    if (approvedLeave) {
+      // Find the full leave request details using the ID
+      const fullRequest = this.allLeaveRequests.find(req => req.id === approvedLeave.id);
+      if (fullRequest) {
+        this.showLeaveDetails(fullRequest);
+      }
+      return;
+    }
+
+    // Skip other month days for selection
+    if (day.isOtherMonth) {
+      return;
+    }
+
+    // Handle date selection for creating new requests
+    this.handleDateSelection(day.date, event);
+  }
+
+  private handleDateSelection(selectedDate: Date, event?: MouseEvent): void {
+    const isShiftKey = event?.shiftKey || false;
+    const normalizedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+
+    if (!this.selectionStartDate || !isShiftKey) {
+      // Start new selection
+      this.selectionStartDate = normalizedDate;
+      this.isSelectingRange = false;
+      this.conflictMessage = '';
+      this.calendarStateService.setSelectedDateRange(normalizedDate);
+    } else {
+      // Complete range selection
+      const startDate = this.selectionStartDate;
+      const endDate = normalizedDate;
+      
+      // Ensure start date is before end date
+      const actualStartDate = startDate <= endDate ? startDate : endDate;
+      const actualEndDate = startDate <= endDate ? endDate : startDate;
+      
+      // Check for conflicts with approved leave
+      if (this.hasConflictWithApprovedLeave(actualStartDate, actualEndDate)) {
+        this.conflictMessage = 'Selected dates conflict with existing approved leave. Please choose different dates.';
+        return;
+      }
+      
+      this.isSelectingRange = true;
+      this.conflictMessage = '';
+      this.calendarStateService.setSelectedDateRange(actualStartDate, actualEndDate);
+    }
+
+    // Update calendar display
+    this.updateCalendarSelection();
+  }
+
+  private hasConflictWithApprovedLeave(startDate: Date, endDate: Date): boolean {
+    const approvedRequests = this.allLeaveRequests.filter(req => req.status === LeaveStatus.ACCEPTED);
+    
+    return approvedRequests.some(request => {
+      const requestStart = new Date(request.startDate);
+      const requestEnd = new Date(request.endDate);
+      
+      // Normalize dates for comparison
+      const reqStartNorm = new Date(requestStart.getFullYear(), requestStart.getMonth(), requestStart.getDate());
+      const reqEndNorm = new Date(requestEnd.getFullYear(), requestEnd.getMonth(), requestEnd.getDate());
+      
+      // Check for overlap
+      return (startDate <= reqEndNorm && endDate >= reqStartNorm);
+    });
+  }
+
+  private updateCalendarSelection(): void {
+    this.calendarDays.forEach(day => {
+      day.isSelected = this.calendarStateService.isDateInSelectedRange(day.date);
+      day.isInSelectedRange = day.isSelected;
+      
+      if (this.selectionStartDate) {
+        const dayTime = day.date.getTime();
+        const startTime = this.selectionStartDate.getTime();
+        day.isSelectionStart = dayTime === startTime;
+        
+        if (this.isSelectingRange) {
+          const selectedRange = this.calendarStateService.getSelectedDateRange();
+          if (selectedRange.endDate) {
+            const endTime = selectedRange.endDate.getTime();
+            day.isSelectionEnd = dayTime === endTime;
+          }
+        }
+      }
+    });
+  }
+
+  showLeaveDetails(leaveRequest: LeaveRequestResponseDto): void {
+    this.selectedLeaveRequest = leaveRequest;
+    this.showLeaveDetailsModal = true;
+  }
+
+  closeLeaveDetailsModal(): void {
+    this.showLeaveDetailsModal = false;
+    this.selectedLeaveRequest = null;
+  }
+
+  clearSelection(): void {
+    this.selectionStartDate = null;
+    this.isSelectingRange = false;
+    this.conflictMessage = '';
+    this.calendarStateService.clearSelectedDateRange();
+    this.updateCalendarSelection();
+  }
+
+  getSelectedDateRangeText(): string {
+    return this.calendarStateService.getFormattedDateRange();
   }
 
   refreshCalendar(): void {
