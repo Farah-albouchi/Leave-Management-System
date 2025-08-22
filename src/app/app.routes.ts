@@ -5,6 +5,7 @@ import { MainLayoutComponent } from './main-layout-component/main-layout-compone
 import { DashboardAdmin } from './pages/admin/dashboard-admin/dashboard-admin';
 import { HolidaysComponent } from './pages/admin/holidays/holidays';
 import { EmployeeProfile } from './pages/admin/manage-employees/employee-profile/employee-profile';
+import { EmployeeProfile as EmployeeProfilePage } from './pages/employee-profile/employee-profile';
 import { ManageEmployees } from './pages/admin/manage-employees/manage-employees';
 import { ManageRequests } from './pages/admin/manage-requests/manage-requests';
 import { StatisticsComponent } from './pages/admin/statistics/statistics';
@@ -57,13 +58,12 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { requiredRole: 'EMPLOYEE' }
       },
-      // Employee profile component was removed
-      // { 
-      //   path: 'profile', 
-      //   component: EmployeeProfileComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { requiredRole: 'EMPLOYEE' }
-      // },
+      { 
+        path: 'profile', 
+        component: EmployeeProfilePage,
+        canActivate: [RoleGuard],
+        data: { requiredRole: 'EMPLOYEE' }
+      },
       {
         path: 'admin',
         canActivate: [RoleGuard],

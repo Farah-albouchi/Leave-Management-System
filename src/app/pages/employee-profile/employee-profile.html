@@ -1,0 +1,271 @@
+<!-- Loading State -->
+<div *ngIf="isLoadingProfile" class="loading-container">
+  <div class="loading-content">
+    <fa-icon [icon]="faSpinner" class="loading-spinner" spin></fa-icon>
+    <p>Loading your profile...</p>
+  </div>
+</div>
+
+<!-- Profile Content -->
+<div *ngIf="!isLoadingProfile" class="profile-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <fa-icon [icon]="faUser" class="header-icon"></fa-icon>
+        <div class="header-text">
+          <h1>My Profile</h1>
+          <p>Manage your personal information and account settings</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Information Card -->
+  <div class="profile-card">
+    <div class="card-header">
+      <h2>
+        <fa-icon [icon]="faUser" class="section-icon"></fa-icon>
+        Personal Information
+      </h2>
+      <button 
+        *ngIf="!isEditingProfile" 
+        (click)="enableProfileEdit()" 
+        class="btn btn-edit"
+        type="button">
+        <fa-icon [icon]="faEdit"></fa-icon>
+        Edit Profile
+      </button>
+    </div>
+
+    <!-- Success/Error Messages for Profile -->
+    <div *ngIf="profileSuccessMessage" class="alert alert-success">
+      <fa-icon [icon]="faCheckCircle"></fa-icon>
+      {{ profileSuccessMessage }}
+    </div>
+    <div *ngIf="profileErrorMessage" class="alert alert-error">
+      <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+      {{ profileErrorMessage }}
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <div class="form-grid">
+        <!-- First Name -->
+        <div class="form-group">
+          <label for="firstName">
+            <fa-icon [icon]="faUser"></fa-icon>
+            First Name *
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            [readonly]="!isEditingProfile"
+            [class.readonly]="!isEditingProfile"
+            [class.error]="firstName?.invalid && firstName?.touched"
+            placeholder="Enter your first name">
+          <div *ngIf="firstName?.invalid && firstName?.touched" class="error-message">
+            <span *ngIf="firstName?.errors?.['required']">First name is required</span>
+            <span *ngIf="firstName?.errors?.['minlength']">First name must be at least 2 characters</span>
+            <span *ngIf="firstName?.errors?.['maxlength']">First name must not exceed 50 characters</span>
+          </div>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-group">
+          <label for="lastName">
+            <fa-icon [icon]="faUser"></fa-icon>
+            Last Name *
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            [readonly]="!isEditingProfile"
+            [class.readonly]="!isEditingProfile"
+            [class.error]="lastName?.invalid && lastName?.touched"
+            placeholder="Enter your last name">
+          <div *ngIf="lastName?.invalid && lastName?.touched" class="error-message">
+            <span *ngIf="lastName?.errors?.['required']">Last name is required</span>
+            <span *ngIf="lastName?.errors?.['minlength']">Last name must be at least 2 characters</span>
+            <span *ngIf="lastName?.errors?.['maxlength']">Last name must not exceed 50 characters</span>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">
+            <fa-icon [icon]="faEnvelope"></fa-icon>
+            Email *
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            [readonly]="!isEditingProfile"
+            [class.readonly]="!isEditingProfile"
+            [class.error]="email?.invalid && email?.touched"
+            placeholder="Enter your email">
+          <div *ngIf="email?.invalid && email?.touched" class="error-message">
+            <span *ngIf="email?.errors?.['required']">Email is required</span>
+            <span *ngIf="email?.errors?.['email']">Please enter a valid email address</span>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label for="phone">
+            <fa-icon [icon]="faPhone"></fa-icon>
+            Phone Number
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            [readonly]="!isEditingProfile"
+            [class.readonly]="!isEditingProfile"
+            [class.error]="phone?.invalid && phone?.touched"
+            placeholder="Enter your phone number">
+          <div *ngIf="phone?.invalid && phone?.touched" class="error-message">
+            <span *ngIf="phone?.errors?.['maxlength']">Phone number must not exceed 20 characters</span>
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group full-width">
+          <label for="address">
+            <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+            Address
+          </label>
+          <textarea
+            id="address"
+            formControlName="address"
+            [readonly]="!isEditingProfile"
+            [class.readonly]="!isEditingProfile"
+            [class.error]="address?.invalid && address?.touched"
+            placeholder="Enter your address"
+            rows="3"></textarea>
+          <div *ngIf="address?.invalid && address?.touched" class="error-message">
+            <span *ngIf="address?.errors?.['maxlength']">Address must not exceed 255 characters</span>
+          </div>
+        </div>
+
+        <!-- CIN -->
+        <div class="form-group">
+          <label for="cin">
+            <fa-icon [icon]="faIdCard"></fa-icon>
+            CIN
+          </label>
+          <input
+            id="cin"
+            type="number"
+            formControlName="cin"
+            [readonly]="!isEditingProfile"
+            [class.readonly]="!isEditingProfile"
+            placeholder="Enter your CIN">
+        </div>
+      </div>
+
+      <!-- Profile Action Buttons -->
+      <div *ngIf="isEditingProfile" class="action-buttons">
+        <button type="submit" class="btn btn-save" [disabled]="isUpdatingProfile || profileForm.invalid">
+          <fa-icon
+  [icon]="isUpdatingProfile ? faSpinner : faSave"
+  [ngClass]="{ 'animate-spin': isUpdatingProfile }">
+</fa-icon>
+          {{ isUpdatingProfile ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button type="button" (click)="cancelProfileEdit()" class="btn btn-cancel" [disabled]="isUpdatingProfile">
+          <fa-icon [icon]="faTimes"></fa-icon>
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Password Change Card -->
+  <div class="profile-card">
+    <div class="card-header">
+      <h2>
+        <fa-icon [icon]="faLock" class="section-icon"></fa-icon>
+        Change Password
+      </h2>
+    </div>
+
+    <!-- Success/Error Messages for Password -->
+    <div *ngIf="passwordSuccessMessage" class="alert alert-success">
+      <fa-icon [icon]="faCheckCircle"></fa-icon>
+      {{ passwordSuccessMessage }}
+    </div>
+    <div *ngIf="passwordErrorMessage" class="alert alert-error">
+      <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+      {{ passwordErrorMessage }}
+    </div>
+
+    <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      <div class="form-grid">
+        <!-- Current Password -->
+        <div class="form-group">
+          <label for="currentPassword">
+            <fa-icon [icon]="faLock"></fa-icon>
+            Current Password *
+          </label>
+          <div class="password-input-container">
+            <input
+              id="currentPassword"
+              [type]="showCurrentPassword ? 'text' : 'password'"
+              formControlName="currentPassword"
+              [class.error]="currentPassword?.invalid && currentPassword?.touched"
+              placeholder="Enter current password">
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="toggleCurrentPasswordVisibility()">
+              <fa-icon [icon]="showCurrentPassword ? faEyeSlash : faEye"></fa-icon>
+            </button>
+          </div>
+          <div *ngIf="currentPassword?.invalid && currentPassword?.touched" class="error-message">
+            <span *ngIf="currentPassword?.errors?.['required']">Current password is required</span>
+          </div>
+        </div>
+
+        <!-- New Password -->
+        <div class="form-group">
+          <label for="newPassword">
+            <fa-icon [icon]="faLock"></fa-icon>
+            New Password *
+          </label>
+          <div class="password-input-container">
+            <input
+              id="newPassword"
+              [type]="showNewPassword ? 'text' : 'password'"
+              formControlName="newPassword"
+              [class.error]="newPassword?.invalid && newPassword?.touched"
+              placeholder="Enter new password">
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="toggleNewPasswordVisibility()">
+              <fa-icon [icon]="showNewPassword ? faEyeSlash : faEye"></fa-icon>
+            </button>
+          </div>
+          <div *ngIf="newPassword?.invalid && newPassword?.touched" class="error-message">
+            <span *ngIf="newPassword?.errors?.['required']">New password is required</span>
+            <span *ngIf="newPassword?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Action Button -->
+      <div class="action-buttons">
+        <button type="submit" class="btn btn-save" [disabled]="isChangingPassword || passwordForm.invalid">
+          <fa-icon
+  [icon]="isChangingPassword ? faSpinner : faLock"
+  [ngClass]="{ 'animate-spin': isChangingPassword }">
+</fa-icon>
+          {{ isChangingPassword ? 'Changing...' : 'Change Password' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
