@@ -1,0 +1,210 @@
+<!-- Filters Header -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <fa-icon [icon]="faFilter" class="text-blue-600"></fa-icon>
+        <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+        <span 
+          *ngIf="hasActiveFilters" 
+          class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+        >
+          {{ getActiveFiltersCount() }} active
+        </span>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <!-- Quick Filter Buttons -->
+        <div class="hidden md:flex items-center gap-2 mr-4">
+          <button
+            (click)="applyQuickFilter('lastMonth')"
+            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+          >
+            Last Month
+          </button>
+          <button
+            (click)="applyQuickFilter('last3Months')"
+            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+          >
+            Last 3 Months
+          </button>
+          <button
+            (click)="applyQuickFilter('thisYear')"
+            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+          >
+            This Year
+          </button>
+        </div>
+
+        <!-- Clear Filters -->
+        <button
+          *ngIf="hasActiveFilters"
+          (click)="clearAllFilters()"
+          class="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+        >
+          <fa-icon [icon]="faTimes" class="text-xs"></fa-icon>
+          Clear
+        </button>
+
+        <!-- Expand/Collapse Toggle -->
+        <button
+          (click)="toggleExpanded()"
+          class="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          <fa-icon [icon]="faSearch" class="text-xs"></fa-icon>
+          {{ isExpanded ? 'Hide' : 'Show' }} Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Filters Summary -->
+    <div *ngIf="hasActiveFilters && !isExpanded" class="mt-2">
+      <p class="text-sm text-gray-600">
+        <span class="font-medium">Active filters:</span> {{ getActiveFiltersText() }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Expandable Filters Form -->
+  <div 
+    *ngIf="isExpanded" 
+    class="px-6 py-4 bg-gray-50"
+    [@slideDown]
+  >
+    <form [formGroup]="filtersForm" class="space-y-4">
+      <!-- Date Range -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <fa-icon [icon]="faCalendarAlt" class="text-gray-400 mr-1"></fa-icon>
+            From Date
+          </label>
+          <input
+            type="date"
+            formControlName="dateFrom"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <fa-icon [icon]="faCalendarAlt" class="text-gray-400 mr-1"></fa-icon>
+            To Date
+          </label>
+          <input
+            type="date"
+            formControlName="dateTo"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+          />
+        </div>
+      </div>
+
+      <!-- Dropdowns -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Leave Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <fa-icon [icon]="faTag" class="text-gray-400 mr-1"></fa-icon>
+            Leave Type
+          </label>
+          <select
+            formControlName="leaveType"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+          >
+            <option *ngFor="let type of leaveTypes" [value]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <fa-icon [icon]="faTag" class="text-gray-400 mr-1"></fa-icon>
+            Status
+          </label>
+          <select
+            formControlName="status"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+          >
+            <option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Department -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <fa-icon [icon]="faBuilding" class="text-gray-400 mr-1"></fa-icon>
+            Department
+          </label>
+          <select
+            formControlName="department"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+          >
+            <option *ngFor="let dept of departments" [value]="dept.value">
+              {{ dept.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Employee Search -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          <fa-icon [icon]="faUser" class="text-gray-400 mr-1"></fa-icon>
+          Employee ID
+        </label>
+        <input
+          type="text"
+          formControlName="employeeId"
+          placeholder="Enter employee ID..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+        />
+      </div>
+
+      <!-- Mobile Quick Filters -->
+      <div class="md:hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Quick Filters</label>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            (click)="applyQuickFilter('lastMonth')"
+            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md border border-gray-200 transition-colors"
+          >
+            Last Month
+          </button>
+          <button
+            type="button"
+            (click)="applyQuickFilter('last3Months')"
+            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md border border-gray-200 transition-colors"
+          >
+            Last 3 Months
+          </button>
+          <button
+            type="button"
+            (click)="applyQuickFilter('thisYear')"
+            class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md border border-gray-200 transition-colors"
+          >
+            This Year
+          </button>
+          <button
+            type="button"
+            (click)="applyQuickFilter('pending')"
+            class="px-3 py-1.5 text-xs font-medium text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 rounded-md border border-yellow-200 transition-colors"
+          >
+            Pending Only
+          </button>
+          <button
+            type="button"
+            (click)="applyQuickFilter('approved')"
+            class="px-3 py-1.5 text-xs font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md border border-green-200 transition-colors"
+          >
+            Approved Only
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
