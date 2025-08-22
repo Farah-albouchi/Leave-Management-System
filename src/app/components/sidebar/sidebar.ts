@@ -52,6 +52,7 @@ export class SidebarComponent {
         { label: 'Leave Requests', path: '/admin/manage-requests', icon: faClipboard },
         { label: 'Holidays', path: '/admin/holidays', icon: faCalendarAlt },
         { label: 'Statistics', path: '/admin/statistics', icon: faChartPie },
+        { label: 'My Profile', path: '/admin/profile', icon: faUser },
       ];
     } else {
       this.menuItems = [

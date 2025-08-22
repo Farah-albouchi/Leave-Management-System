@@ -1,20 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { Notification } from '../../models/notification.models';
 import { User } from '../../models/auth.models';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule],
+  imports: [CommonModule , FontAwesomeModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar implements OnInit, OnDestroy {
   @Output() toggleSidebar = new EventEmitter<void>();
+  isSidebarOpen = false;
+faChevronRight = faChevronRight;
 
   currentUser: User | null = null;
   showNotifications = false;
@@ -24,7 +28,7 @@ export class Navbar implements OnInit, OnDestroy {
   isLoggingOut = false;
   
   private destroy$ = new Subject<void>();
-
+  @ViewChild('notificationDropdown') notificationDropdown!: ElementRef;
   constructor(
     private authService: AuthService,
     public notificationService: NotificationService
@@ -59,6 +63,7 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   onMenuClick(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
     this.toggleSidebar.emit();
   }
 
@@ -69,6 +74,16 @@ export class Navbar implements OnInit, OnDestroy {
     // If opening notifications, refresh them
     if (this.showNotifications) {
       this.notificationService.refresh();
+    }
+  }
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    if (
+      this.showNotifications &&
+      this.notificationDropdown &&
+      !this.notificationDropdown.nativeElement.contains(event.target)
+    ) {
+      this.showNotifications = false;
     }
   }
 

@@ -54,7 +54,12 @@ export class RecentLeave implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (requests) => {
-          this.leaveRequests = this.transformRequests(requests);
+          const toMs = (d?: string | number | Date | null) =>
+            d ? new Date(d).getTime() : -Infinity; // pushes missing dates to the end
+  
+          const sorted = [...requests].sort((a, b) => toMs(b?.createdAt) - toMs(a?.createdAt));
+  
+          this.leaveRequests = this.transformRequests(sorted);
           this.isLoading = false;
         },
         error: (error) => {

@@ -78,17 +78,26 @@ export class ManageRequests implements OnInit, OnDestroy {
   }
 
   filteredRequests(): LeaveRequestResponseDto[] {
-    return this.requests.filter(request => {
-      const matchesSearch = !this.searchTerm || 
-        request.employeeName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        request.reason.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
-      const matchesStatus = !this.filterStatus || request.status === this.filterStatus;
-      
-      return matchesSearch && matchesStatus;
-    });
+    return this.requests
+      .filter(request => {
+        const matchesSearch =
+          !this.searchTerm ||
+          request.employeeName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          request.reason.toLowerCase().includes(this.searchTerm.toLowerCase());
+  
+        const matchesStatus =
+          !this.filterStatus || request.status === this.filterStatus;
+  
+        return matchesSearch && matchesStatus;
+      })
+      // 🔑 Sort by createdAt DESC (most recent first)
+      .sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
   }
-
+  
   onFiltersChange(): void {
     // Filters are applied through filteredRequests() method
   }

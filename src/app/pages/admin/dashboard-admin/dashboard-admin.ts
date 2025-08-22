@@ -6,10 +6,10 @@ import { takeUntil } from 'rxjs/operators';
 import { Card } from '../../../components/card/card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faClock, faClipboard, faCheckCircle, faRectangleXmark, faChartBar, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faPlus, faUsers, faChartLine } from '@fortawesome/free-solid-svg-icons';
-import { AdminDashboardService } from '../../../services/admin-dashboard.service';
-import { AdminDashboardSummary, AdminDashboardData } from '../../../models/admin-dashboard.models';
-import { AdminLeaveRequestDto, LeaveStatus } from '../../../models/admin-request.models';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { DashboardService, AdminDashboardStats } from '../../../services/dashboard.service';
+import { LeaveRequestService } from '../../../services/leave-request.service';
+import { LeaveRequestResponseDto, LeaveStatus } from '../../../models/leave-request.models';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -18,39 +18,33 @@ import { AdminLeaveRequestDto, LeaveStatus } from '../../../models/admin-request
   styleUrl: './dashboard-admin.css'
 })
 export class DashboardAdmin implements OnInit, OnDestroy {
-  // Icons
   faPlus = faPlus;
   faCalendar = faCalendar;
   faClock = faClock;
   faClipboard = faClipboard;
   faCheckCircle = faCheckCircle;
   faExclamationTriangle = faRectangleXmark;
-  faChartLine = faChartLine;
-  faUsers = faUsers;
+  faChartLine = faChartBar;
+  faUsers = faUser;
 
-  // Dashboard data
-  dashboardData: AdminDashboardData | null = null;
-  dashboardSummary: AdminDashboardSummary = {
-    totalRequests: 0,
-    pendingRequests: 0,
-    approvedRequests: 0,
-    rejectedRequests: 0,
+  adminStats: AdminDashboardStats = {
     totalEmployees: 0,
-    employeesOnLeaveToday: 0,
-    overLimitEmployees: 0
+    pendingRequests: 0,
+    onLeaveToday: 0,
+    overLimit: 0
   };
 
-  pendingRequests: AdminLeaveRequestDto[] = [];
-  recentRequests: AdminLeaveRequestDto[] = [];
+  pendingRequests: LeaveRequestResponseDto[] = [];
+  recentRequests: LeaveRequestResponseDto[] = [];
   
-  // State
   isLoading = true;
   errorMessage = '';
 
   private destroy$ = new Subject<void>();
 
   constructor(
-    private adminDashboardService: AdminDashboardService,
+    private dashboardService: DashboardService,
+    private leaveRequestService: LeaveRequestService,
     private router: Router
   ) {}
 
@@ -67,45 +61,46 @@ export class DashboardAdmin implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Load complete dashboard data
-    this.adminDashboardService.getAdminDashboardData()
+    // Load admin statistics
+    this.dashboardService.getAdminDashboardStats()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (dashboardData) => {
-          this.dashboardData = dashboardData;
-          this.dashboardSummary = dashboardData.summary;
-          this.loadPendingRequests();
+        next: (stats) => {
+          this.adminStats = stats;
         },
         error: (error) => {
-          console.error('Error loading admin dashboard:', error);
-          this.errorMessage = 'Failed to load dashboard data';
-          this.isLoading = false;
+          console.error('Error loading admin stats:', error);
+          this.errorMessage = 'Failed to load dashboard statistics';
         }
       });
+
+    // Load pending requests
+    this.loadPendingRequests();
   }
 
   private loadPendingRequests(): void {
-    // Load pending and recent requests
-    this.adminDashboardService.getPendingRequests()
+    // Load all admin requests and filter for pending
+    this.leaveRequestService.getAllRequestsForAdmin()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (pendingRequests) => {
-          this.pendingRequests = pendingRequests.slice(0, 5); // Show only top 5 pending
-        },
-        error: (error) => {
-          console.error('Error loading pending requests:', error);
-        }
-      });
-
-    this.adminDashboardService.getRecentRequests(8)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (recentRequests) => {
-          this.recentRequests = recentRequests;
+        next: (requests) => {
+          this.pendingRequests = requests
+            .filter(req => req.status === LeaveStatus.PENDING)
+            .slice(0, 5); // Show only top 5 pending
+          
+          this.recentRequests = requests
+            .sort((a, b) => {
+              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+              return dateB - dateA;
+            })
+            .slice(0, 8); // Show recent 8 requests
+          
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Error loading recent requests:', error);
+          console.error('Error loading pending requests:', error);
+          this.errorMessage = 'Failed to load pending requests';
           this.isLoading = false;
         }
       });
@@ -133,12 +128,12 @@ export class DashboardAdmin implements OnInit, OnDestroy {
   }
 
   // Quick actions from dashboard
-  quickApproveRequest(request: AdminLeaveRequestDto): void {
+  quickApproveRequest(request: LeaveRequestResponseDto): void {
     if (!confirm(`Are you sure you want to approve ${request.employeeName || 'this employee'}'s leave request?`)) {
       return;
     }
 
-    this.adminDashboardService.approveRequest(request.id)
+    this.leaveRequestService.updateRequestStatus(request.id, LeaveStatus.ACCEPTED)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -152,11 +147,11 @@ export class DashboardAdmin implements OnInit, OnDestroy {
       });
   }
 
-  quickRejectRequest(request: AdminLeaveRequestDto): void {
+  quickRejectRequest(request: LeaveRequestResponseDto): void {
     const reason = prompt('Please provide a reason for rejection:');
     if (!reason) return;
 
-    this.adminDashboardService.rejectRequest(request.id, reason)
+    this.leaveRequestService.updateRequestStatus(request.id, LeaveStatus.REJECTED, reason)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -170,7 +165,7 @@ export class DashboardAdmin implements OnInit, OnDestroy {
       });
   }
 
-  viewRequestDetails(request: AdminLeaveRequestDto): void {
+  viewRequestDetails(request: LeaveRequestResponseDto): void {
     this.router.navigate(['/admin/manage-requests']);
   }
 
@@ -201,7 +196,7 @@ export class DashboardAdmin implements OnInit, OnDestroy {
   }
 
   // Helper methods for template calculations
-  calculateDaysText(request: AdminLeaveRequestDto): string {
+  calculateDaysText(request: LeaveRequestResponseDto): string {
     if (request.halfDay) {
       return '0.5 day';
     }
@@ -210,8 +205,12 @@ export class DashboardAdmin implements OnInit, OnDestroy {
       return '1 day';
     }
     
-    const days = this.adminDashboardService.calculateDays(request.startDate, request.endDate, request.halfDay);
-    return days === 1 ? '1 day' : `${days} days`;
+    const startDate = new Date(request.startDate);
+    const endDate = new Date(request.endDate);
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    
+    return `${diffDays} days`;
   }
 
   getEmployeeInitials(employeeName: string): string {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -29,11 +29,12 @@ import {
   EmployeeFilter 
 } from '../../../models/employee.models';
 import { AdminLeaveRequestDto } from '../../../models/admin-request.models';
+import { EmployeeProfileModalComponent } from '../../../components/employee-profile-modal/employee-profile-modal';
 
 @Component({
   selector: 'app-manage-employees',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, EmployeeProfileModalComponent],
   templateUrl: './manage-employees.html',
   styleUrls: ['./manage-employees.css']
 })
@@ -82,10 +83,15 @@ export class ManageEmployees implements OnInit, OnDestroy {
   showDeleteModal = false;
   showResetPasswordModal = false;
   showLeaveHistoryModal = false;
+  showProfileModal = false;
   
   selectedEmployee: Employee | null = null;
   leaveHistory: AdminLeaveRequestDto[] = [];
   resetPasswordResult = '';
+  
+  // Delete confirmation properties
+  deleteConfirmationText = '';
+  isDeleting = false;
 
   // Forms
   addEmployeeForm!: FormGroup;
@@ -171,7 +177,10 @@ export class ManageEmployees implements OnInit, OnDestroy {
 
   // Filter methods
   applyFilters(): void {
-    this.filteredEmployees = this.employeeService.filterEmployees(this.employees, this.filters);
+    this.filteredEmployees = this.employeeService
+      .filterEmployees(this.employees, this.filters)
+      // 🚫 Exclude admin@example.com
+      .filter(emp => emp.email?.toLowerCase() !== 'admin@example.com');
   }
 
   onFiltersChange(): void {
@@ -304,21 +313,31 @@ export class ManageEmployees implements OnInit, OnDestroy {
     this.selectedEmployee = null;
   }
 
-  // Navigate to employee profile
+  // Navigate to employee profile (now opens modal instead)
   viewEmployeeProfile(employee: Employee): void {
-    this.router.navigate(['/admin/manage-employees/profile', employee.id]);
+    this.openProfileModal(employee);
   }
 
-  // Delete confirmation properties
-  deleteConfirmationText = '';
-  isDeleting = false;
-  @ViewChild('confirmInput') confirmInput!: ElementRef<HTMLInputElement>;
+  // Profile modal methods
+  openProfileModal(employee: Employee): void {
+    console.log('🔄 Opening profile modal for employee:', employee);
+    this.selectedEmployee = employee;
+    this.showProfileModal = true;
+    document.body.classList.add('modal-open');
+    console.log('✅ Profile modal state - showProfileModal:', this.showProfileModal, 'selectedEmployee:', this.selectedEmployee);
+  }
+
+  closeProfileModal(): void {
+    this.showProfileModal = false;
+    this.selectedEmployee = null;
+    document.body.classList.remove('modal-open');
+  }
 
   // Delete confirmation methods
   openDeleteModal(employee: Employee): void {
     console.log('Opening delete modal for employee:', employee); // Debug log
     
-    // Prevent deletion of admin users
+    // Check if trying to delete admin user
     if (employee.role === 'ADMIN') {
       this.errorMessage = 'Admin users cannot be deleted for security reasons.';
       return;
@@ -330,13 +349,6 @@ export class ManageEmployees implements OnInit, OnDestroy {
     this.isDeleting = false;
     this.showDeleteModal = true;
     document.body.classList.add('modal-open');
-    
-    // Focus on the confirmation input after the modal is rendered
-    setTimeout(() => {
-      if (this.confirmInput?.nativeElement) {
-        this.confirmInput.nativeElement.focus();
-      }
-    }, 100);
   }
 
   closeDeleteModal(): void {
@@ -351,32 +363,23 @@ export class ManageEmployees implements OnInit, OnDestroy {
   confirmDelete(): void {
     if (this.selectedEmployee && this.deleteConfirmationText === 'DELETE') {
       this.isDeleting = true;
+      
       this.employeeService.deleteEmployee(this.selectedEmployee.id).subscribe({
         next: (response) => {
-          this.successMessage = `Employee ${this.formatEmployeeName(this.selectedEmployee!)} has been successfully deleted.`;
+          this.successMessage = response.message;
           this.closeDeleteModal();
           this.refreshData();
         },
         error: (error) => {
-          this.errorMessage = `Failed to delete employee: ${error.message}`;
+          this.errorMessage = error.message;
           this.isDeleting = false;
         }
       });
     }
   }
 
-  // Check if delete confirmation is valid
   isDeleteConfirmationValid(): boolean {
     return this.deleteConfirmationText === 'DELETE';
-  }
-
-  // Handle keyboard events
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (this.showDeleteModal && event.key === 'Escape' && !this.isDeleting) {
-      event.preventDefault();
-      this.closeDeleteModal();
-    }
   }
 
   // Reset password methods

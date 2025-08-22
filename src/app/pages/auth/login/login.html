@@ -1,176 +1,233 @@
 <div class="min-h-screen flex flex-col lg:flex-row bg-gray-100 ml-16">
-
-    <!-- Left Panel -->
-    <div class="hidden lg:flex lg:w-1/2 flex-col justify-center items-start  xr:px-20 bg-white">
-      <div class="max-w-lg space-y-6">
-        <!-- Brand -->
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-            <fa-icon [icon]="faCalendar" class=" text-blue-700"></fa-icon>
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">LeaveSync</h1>
-            <p class="text-sm text-gray-500">Smart Leave Management</p>
-          </div>
+  <!-- Left Panel -->
+  <div
+    class="hidden lg:flex lg:w-1/2 flex-col justify-center items-start xr:px-20 bg-white"
+  >
+    <div class="max-w-lg space-y-6">
+      <!-- Brand -->
+      <div class="flex items-center gap-4 mb-4">
+        <div
+          class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"
+        >
+          <fa-icon [icon]="faCalendar" class="text-blue-700"></fa-icon>
         </div>
-  
-        <!-- Title -->
-        <h2 class="text-4xl font-bold text-gray-800 leading-tight">
-          Streamline Your <span class="text-blue-600">Leave Requests</span>
-        </h2>
-        <p class="text-lg text-gray-600">
-          Effortlessly manage employee leave requests with our intuitive dashboard. Submit, track, and approve time-off requests in just a few clicks.
-        </p>
-  
-        <!-- Features -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="faCheckCircle" class=" text-green-600"></fa-icon>
-            </div>
-            <span class="text-sm font-medium text-gray-800">Quick Approval</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="faCalendar" class=" text-blue-600"></fa-icon>
-            </div>
-            <span class="text-sm font-medium text-gray-800">Smart Scheduling</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="faClock" class=" text-yellow-600"></fa-icon>
-            </div>
-            <span class="text-sm font-medium text-gray-800">Real-time Tracking</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-              <fa-icon [icon]="faUserGroup" class=" text-purple-600"></fa-icon>
-            </div>
-            <span class="text-sm font-medium text-gray-800">Team Overview</span>
-          </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">LeaveSync</h1>
+          <p class="text-sm text-gray-500">Smart Leave Management</p>
         </div>
-  
-        
       </div>
-    </div>
-  
-    <!-- Right Panel -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-      <div class="w-full max-w-md bg-white/90 rounded-xl shadow-lg p-8 backdrop-blur-md">
-        <!-- Header -->
-        <div class="text-center space-y-2 mb-6">
-          <div class="flex justify-center">
-            <div class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center shadow-md">
-              <fa-icon [icon]="faKey" class=" text-blue-900"></fa-icon>
-            </div>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
-          <p class="text-sm text-gray-500">Sign in to your leave management account</p>
-        </div>
-  
-        <!-- Role Toggle -->
-        <div class="flex gap-2 p-1 bg-gray-100 rounded-lg mb-6">
-          <button
-            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all"
-            [ngClass]="{
-              'bg-blue-600 text-white shadow-sm': userType === 'employee',
-              'text-gray-500 hover:text-gray-800': userType !== 'employee'
-            }"
-            (click)="toggleUserType('employee')">
-            <fa-icon [icon]="faUsers" class="w-4 h-4"></fa-icon>
-            Employee
-          </button>
-          <button
-            class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all"
-            [ngClass]="{
-              'bg-blue-600 text-white shadow-sm': userType === 'admin',
-              'text-gray-500 hover:text-gray-800': userType !== 'admin'
-            }"
-            (click)="toggleUserType('admin')">
-            <fa-icon [icon]="faShield" class="w-4 h-4"></fa-icon>
-            Admin
-          </button>
-        </div>
-  
-        <!-- Error Message -->
-        <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-600">{{ errorMessage }}</p>
-        </div>
 
-        <!-- Login Form -->
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-          <div>
-            <label class="text-sm font-medium block mb-1">Email Address</label>
-            <div class="relative">
-              <fa-icon [icon]="faEnvelope" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></fa-icon>
-              <input
-                type="email"
-                formControlName="email"
-                placeholder="Enter your email"
-                [class]="'pl-10 w-full h-12 rounded-lg border bg-gray-50 focus:border-blue-500 outline-none ' + 
-                         (isFieldInvalid('email') ? 'border-red-300 focus:border-red-500' : 'border-gray-300')"
-              />
-            </div>
-            <div *ngIf="isFieldInvalid('email')" class="mt-1 text-xs text-red-600">
-              {{ getFieldError('email') }}
-            </div>
+      <!-- Title -->
+      <h2 class="text-4xl font-bold text-gray-800 leading-tight">
+        Streamline Your <span class="text-blue-600">Leave Requests</span>
+      </h2>
+      <p class="text-lg text-gray-600">
+        Effortlessly manage employee leave requests with our intuitive
+        dashboard. Submit, track, and approve time-off requests in just a few
+        clicks.
+      </p>
+
+      <!-- Features -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"
+          >
+            <fa-icon [icon]="faCheckCircle" class="text-green-600"></fa-icon>
           </div>
-  
-          <div>
-            <label class="text-sm font-medium block mb-1">Password</label>
-            <div class="relative">
-              <fa-icon [icon]="faLock" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></fa-icon>
-              <input
-                [type]="showPassword ? 'text' : 'password'"
-                formControlName="password"
-                placeholder="Enter your password"
-                [class]="'pl-10 pr-10 w-full h-12 rounded-lg border bg-gray-50 focus:border-blue-500 outline-none ' + 
-                         (isFieldInvalid('password') ? 'border-red-300 focus:border-red-500' : 'border-gray-300')"
-              />
-              <button
-                type="button"
-                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                (click)="togglePassword()">
-                <fa-icon [icon]="showPassword ? faEyeSlash : faEye" class="w-4 h-4"></fa-icon>
-              </button>
-            </div>
-            <div *ngIf="isFieldInvalid('password')" class="mt-1 text-xs text-red-600">
-              {{ getFieldError('password') }}
-            </div>
+          <span class="text-sm font-medium text-gray-800">Quick Approval</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"
+          >
+            <fa-icon [icon]="faCalendar" class="text-blue-600"></fa-icon>
           </div>
-  
-          <div class="flex justify-between items-center text-sm">
-            <label class="flex items-center gap-2">
-              <input 
-                type="checkbox" 
-                formControlName="rememberMe"
-                class="w-4 h-4 rounded border-gray-300" 
-              />
-              Remember me
-            </label>
-            <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
+          <span class="text-sm font-medium text-gray-800"
+            >Smart Scheduling</span
+          >
+        </div>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"
+          >
+            <fa-icon [icon]="faClock" class="text-yellow-600"></fa-icon>
           </div>
-  
-          <button
-            type="submit"
-            [disabled]="isLoading"
-            [class]="'w-full h-12 transition rounded-lg text-white font-semibold shadow-md flex items-center justify-center gap-2 ' +
-                     (isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700')">
-            <fa-icon 
-              *ngIf="isLoading" 
-              [icon]="faSpinner" 
-              class="w-4 h-4 animate-spin">
-            </fa-icon>
-            <span>
-              {{ isLoading ? 'Signing in...' : 'Sign In as ' + (userType === 'employee' ? 'Employee' : 'Administrator') }}
-            </span>
-          </button>
-  
-          <p class="text-center text-xs text-gray-400 mt-6">
-            Need help? <a href="#" class="text-blue-500 hover:underline font-medium">Contact IT Support</a>
-          </p>
-        </form>
+          <span class="text-sm font-medium text-gray-800"
+            >Real-time Tracking</span
+          >
+        </div>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center"
+          >
+            <fa-icon [icon]="faUserGroup" class="text-purple-600"></fa-icon>
+          </div>
+          <span class="text-sm font-medium text-gray-800">Team Overview</span>
+        </div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Right Panel -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+    <div
+      class="w-full max-w-md bg-white/90 rounded-xl shadow-lg p-8 backdrop-blur-md"
+    >
+      <!-- Header -->
+      <div class="text-center space-y-2 mb-6">
+        <div class="flex justify-center">
+          <div
+            class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center shadow-md"
+          >
+            <fa-icon [icon]="faKey" class="text-blue-900"></fa-icon>
+          </div>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+        <p class="text-sm text-gray-500">
+          Sign in to your leave management account
+        </p>
+      </div>
+
+      <!-- Role Toggle -->
+      <div class="flex gap-2 p-1 bg-gray-100 rounded-lg mb-6">
+        <button
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all"
+          [ngClass]="{
+            'bg-blue-600 text-white shadow-sm': userType === 'employee',
+            'text-gray-500 hover:text-gray-800': userType !== 'employee'
+          }"
+          (click)="toggleUserType('employee')"
+        >
+          <fa-icon [icon]="faUsers" class="w-4 h-4"></fa-icon>
+          Employee
+        </button>
+        <button
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all"
+          [ngClass]="{
+            'bg-blue-600 text-white shadow-sm': userType === 'admin',
+            'text-gray-500 hover:text-gray-800': userType !== 'admin'
+          }"
+          (click)="toggleUserType('admin')"
+        >
+          <fa-icon [icon]="faShield" class="w-4 h-4"></fa-icon>
+          Admin
+        </button>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        *ngIf="errorMessage"
+        class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg"
+      >
+        <p class="text-sm text-red-600">{{ errorMessage }}</p>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        <div>
+          <label class="text-sm font-medium block mb-1">Email Address</label>
+          <div class="relative">
+            <fa-icon
+              [icon]="faEnvelope"
+              class="absolute left-3 top-3 w-4 h-4 text-gray-400"
+            ></fa-icon>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Enter your email"
+              [class]="
+                'pl-10 w-full h-12 rounded-lg border bg-gray-50 focus:border-blue-500 outline-none ' +
+                (isFieldInvalid('email')
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-gray-300')
+              "
+            />
+          </div>
+          <div
+            *ngIf="isFieldInvalid('email')"
+            class="mt-1 text-xs text-red-600"
+          >
+            {{ getFieldError("email") }}
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium block mb-1">Password</label>
+          <div class="relative">
+            <fa-icon
+              [icon]="faLock"
+              class="absolute left-3 top-3 w-4 h-4 text-gray-400"
+            ></fa-icon>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter your password"
+              [class]="
+                'pl-10 pr-10 w-full h-12 rounded-lg border bg-gray-50 focus:border-blue-500 outline-none ' +
+                (isFieldInvalid('password')
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-gray-300')
+              "
+            />
+            <button
+              type="button"
+              class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              (click)="togglePassword()"
+            >
+              <fa-icon
+                [icon]="showPassword ? faEyeSlash : faEye"
+                class="w-4 h-4"
+              ></fa-icon>
+            </button>
+          </div>
+          <div
+            *ngIf="isFieldInvalid('password')"
+            class="mt-1 text-xs text-red-600"
+          >
+            {{ getFieldError("password") }}
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center text-sm">
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              formControlName="rememberMe"
+              class="w-4 h-4 rounded border-gray-300"
+            />
+            Remember me
+          </label>
+          <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          [class]="
+            'w-full h-12 transition rounded-lg text-white font-semibold shadow-md flex items-center justify-center gap-2 ' +
+            (isLoading
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700')
+          "
+        >
+          <span>
+            {{
+              isLoading
+                ? "Signing in..."
+                : "Sign In as " +
+                  (userType === "employee" ? "Employee" : "Administrator")
+            }}
+          </span>
+        </button>
+
+        <p class="text-center text-xs text-gray-400 mt-6">
+          Need help?
+          <a href="#" class="text-blue-500 hover:underline font-medium"
+            >Contact IT Support</a
+          >
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

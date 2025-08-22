@@ -1,0 +1,330 @@
+<div class="admin-profile-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+     <!-- Error Message -->
+   <div *ngIf="errorMessage" class="error-message">
+     <div class="alert alert-danger">
+       <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+       {{ errorMessage }}
+     </div>
+   </div>
+
+   <!-- Success Message -->
+   <div *ngIf="successMessage" class="success-message">
+     <div class="alert alert-success">
+       <fa-icon [icon]="faCheckCircle"></fa-icon>
+       {{ successMessage }}
+     </div>
+   </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!isLoading && profile" class="profile-content">
+    <!-- Header Section -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-circle">
+          <span class="avatar-text">{{ getInitials() }}</span>
+        </div>
+                 <div class="admin-badge">
+           <fa-icon [icon]="faCrown"></fa-icon>
+           <span>Administrator</span>
+         </div>
+      </div>
+      
+      <div class="profile-info">
+        <h1>{{ profile.firstName }} {{ profile.lastName }}</h1>
+        <p class="email">{{ profile.email }}</p>
+        <div class="profile-stats">
+          <div class="stat">
+            <span class="stat-label">Member since:</span>
+            <span class="stat-value">{{ formatDate(profile.createdAt) }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Profile completion:</span>
+            <span class="stat-value">{{ getProfileCompletionPercentage() }}%</span>
+          </div>
+        </div>
+      </div>
+
+             <div class="profile-actions">
+         <button class="btn btn-primary" (click)="openEditModal()">
+           <fa-icon [icon]="faEdit"></fa-icon>
+           Edit Profile
+         </button>
+         <button class="btn btn-secondary" (click)="openPasswordModal()">
+           <fa-icon [icon]="faKey"></fa-icon>
+           Change Password
+         </button>
+       </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="profile-details">
+      <div class="details-grid">
+                 <!-- Personal Information -->
+         <div class="detail-card">
+           <div class="card-header">
+             <fa-icon [icon]="faUser"></fa-icon>
+             <h3>Personal Information</h3>
+           </div>
+          <div class="card-content">
+            <div class="detail-row">
+              <span class="detail-label">First Name:</span>
+              <span class="detail-value">{{ profile.firstName || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Last Name:</span>
+              <span class="detail-value">{{ profile.lastName || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email:</span>
+              <span class="detail-value">{{ profile.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Phone:</span>
+              <span class="detail-value">{{ profile.phone || 'Not provided' }}</span>
+            </div>
+          </div>
+        </div>
+
+                 <!-- Contact Information -->
+         <div class="detail-card">
+           <div class="card-header">
+             <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+             <h3>Contact Information</h3>
+           </div>
+          <div class="card-content">
+            <div class="detail-row">
+              <span class="detail-label">Address:</span>
+              <span class="detail-value">{{ profile.address || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">CIN:</span>
+              <span class="detail-value">{{ profile.cin || 'Not provided' }}</span>
+            </div>
+          </div>
+        </div>
+
+                 <!-- Account Information -->
+         <div class="detail-card">
+           <div class="card-header">
+             <fa-icon [icon]="faShieldAlt"></fa-icon>
+             <h3>Account Information</h3>
+           </div>
+          <div class="card-content">
+            <div class="detail-row">
+              <span class="detail-label">User ID:</span>
+              <span class="detail-value">{{ profile.id }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Role:</span>
+              <span class="detail-value">
+                <span class="role-badge admin">{{ profile.role }}</span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Account Created:</span>
+              <span class="detail-value">{{ formatDate(profile.createdAt) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Profile Status:</span>
+              <span class="detail-value">
+                <span class="status-badge" [class.completed]="profile.profileCompleted" [class.pending]="!profile.profileCompleted">
+                  {{ profile.profileCompleted ? 'Completed' : 'Pending' }}
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Edit Profile</h3>
+             <button class="close-btn" (click)="closeEditModal()">
+         <fa-icon [icon]="faTimes"></fa-icon>
+       </button>
+    </div>
+
+    <form [formGroup]="editProfileForm" (ngSubmit)="updateProfile()" class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name *</label>
+          <input 
+            type="text" 
+            id="firstName" 
+            formControlName="firstName" 
+            [class.error]="editProfileForm.get('firstName')?.invalid && editProfileForm.get('firstName')?.touched"
+          >
+          <div *ngIf="editProfileForm.get('firstName')?.invalid && editProfileForm.get('firstName')?.touched" class="error-message">
+            First name is required and must be at least 2 characters
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name *</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            formControlName="lastName" 
+            [class.error]="editProfileForm.get('lastName')?.invalid && editProfileForm.get('lastName')?.touched"
+          >
+          <div *ngIf="editProfileForm.get('lastName')?.invalid && editProfileForm.get('lastName')?.touched" class="error-message">
+            Last name is required and must be at least 2 characters
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          [class.error]="editProfileForm.get('email')?.invalid && editProfileForm.get('email')?.touched"
+        >
+        <div *ngIf="editProfileForm.get('email')?.invalid && editProfileForm.get('email')?.touched" class="error-message">
+          Please enter a valid email address
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          formControlName="phone" 
+          placeholder="e.g., +1 (555) 123-4567"
+          [class.error]="editProfileForm.get('phone')?.invalid && editProfileForm.get('phone')?.touched"
+        >
+        <div *ngIf="editProfileForm.get('phone')?.invalid && editProfileForm.get('phone')?.touched" class="error-message">
+          Please enter a valid phone number
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+        <textarea 
+          id="address" 
+          formControlName="address" 
+          rows="3"
+          placeholder="Enter your full address"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="cin">CIN (National ID)</label>
+        <input 
+          type="text" 
+          id="cin" 
+          formControlName="cin" 
+          placeholder="Enter your CIN number"
+          [class.error]="editProfileForm.get('cin')?.invalid && editProfileForm.get('cin')?.touched"
+        >
+        <div *ngIf="editProfileForm.get('cin')?.invalid && editProfileForm.get('cin')?.touched" class="error-message">
+          CIN must contain only digits
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="isUpdating">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="editProfileForm.invalid || isUpdating">
+          <span *ngIf="isUpdating">Updating...</span>
+          <span *ngIf="!isUpdating">Update Profile</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div *ngIf="showPasswordModal" class="modal-overlay" (click)="closePasswordModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Change Password</h3>
+             <button class="close-btn" (click)="closePasswordModal()">
+         <fa-icon [icon]="faTimes"></fa-icon>
+       </button>
+    </div>
+
+    <form [formGroup]="changePasswordForm" (ngSubmit)="changePassword()" class="modal-body">
+      <div class="form-group">
+        <label for="currentPassword">Current Password *</label>
+        <div class="password-input">
+          <input 
+            [type]="showCurrentPassword ? 'text' : 'password'" 
+            id="currentPassword" 
+            formControlName="currentPassword" 
+            [class.error]="changePasswordForm.get('currentPassword')?.invalid && changePasswordForm.get('currentPassword')?.touched"
+          >
+                     <button type="button" class="password-toggle" (click)="togglePasswordVisibility('current')">
+             <fa-icon [icon]="showCurrentPassword ? faEyeSlash : faEye"></fa-icon>
+           </button>
+        </div>
+        <div *ngIf="changePasswordForm.get('currentPassword')?.invalid && changePasswordForm.get('currentPassword')?.touched" class="error-message">
+          Current password is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">New Password *</label>
+        <div class="password-input">
+          <input 
+            [type]="showNewPassword ? 'text' : 'password'" 
+            id="newPassword" 
+            formControlName="newPassword" 
+            [class.error]="changePasswordForm.get('newPassword')?.invalid && changePasswordForm.get('newPassword')?.touched"
+          >
+                     <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
+             <fa-icon [icon]="showNewPassword ? faEyeSlash : faEye"></fa-icon>
+           </button>
+        </div>
+        <div *ngIf="changePasswordForm.get('newPassword')?.invalid && changePasswordForm.get('newPassword')?.touched" class="error-message">
+          New password must be at least 6 characters long
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm New Password *</label>
+        <div class="password-input">
+          <input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            id="confirmPassword" 
+            formControlName="confirmPassword" 
+            [class.error]="changePasswordForm.get('confirmPassword')?.invalid && changePasswordForm.get('confirmPassword')?.touched"
+          >
+                     <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
+             <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye"></fa-icon>
+           </button>
+        </div>
+        <div *ngIf="changePasswordForm.get('confirmPassword')?.invalid && changePasswordForm.get('confirmPassword')?.touched" class="error-message">
+          Please confirm your new password
+        </div>
+        <div *ngIf="changePasswordForm.errors?.['passwordMismatch'] && changePasswordForm.get('confirmPassword')?.touched" class="error-message">
+          Passwords do not match
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePasswordModal()" [disabled]="isChangingPassword">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="changePasswordForm.invalid || isChangingPassword">
+          <span *ngIf="isChangingPassword">Changing...</span>
+          <span *ngIf="!isChangingPassword">Change Password</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

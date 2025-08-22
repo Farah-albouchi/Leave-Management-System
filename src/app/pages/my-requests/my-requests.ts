@@ -53,7 +53,11 @@ export class MyRequests implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (requests) => {
-          this.leaveRequests = requests;
+          const toMs = (d?: string | number | Date | null) =>
+            d ? new Date(d).getTime() : -Infinity; 
+  
+          const sorted = [...requests].sort((a, b) => toMs(b?.createdAt) - toMs(a?.createdAt));
+          this.leaveRequests = sorted;
           this.applyStatusFilter();
           this.isLoading = false;
         },

@@ -51,7 +51,7 @@ export class ApplyLeave implements OnInit, OnDestroy {
       reason: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
     });
 
-    // Watch for date changes to calculate working days
+
     this.leaveForm.get('startDate')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.calculateWorkingDays());

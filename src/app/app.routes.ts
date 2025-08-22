@@ -8,12 +8,13 @@ import { EmployeeProfile } from './pages/admin/manage-employees/employee-profile
 import { ManageEmployees } from './pages/admin/manage-employees/manage-employees';
 import { ManageRequests } from './pages/admin/manage-requests/manage-requests';
 import { StatisticsComponent } from './pages/admin/statistics/statistics';
+import { AdminProfileComponent } from './pages/admin/admin-profile/admin-profile';
 import { ApplyLeave } from './pages/apply-leave/apply-leave';
 import { CalendarLeave } from './pages/calendar-leave/calendar-leave';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { LeaveBalance } from './pages/leave-balance/leave-balance';
 import { MyRequests } from './pages/my-requests/my-requests';
-import { EmployeeProfileComponent } from './pages/employee-profile/employee-profile';
+
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 
@@ -56,12 +57,13 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { requiredRole: 'EMPLOYEE' }
       },
-      { 
-        path: 'profile', 
-        component: EmployeeProfileComponent,
-        canActivate: [RoleGuard],
-        data: { requiredRole: 'EMPLOYEE' }
-      },
+      // Employee profile component was removed
+      // { 
+      //   path: 'profile', 
+      //   component: EmployeeProfileComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { requiredRole: 'EMPLOYEE' }
+      // },
       {
         path: 'admin',
         canActivate: [RoleGuard],
@@ -74,6 +76,7 @@ export const routes: Routes = [
           { path: 'manage-requests', component: ManageRequests },
           { path: 'holidays', component: HolidaysComponent },
           { path: 'statistics', component: StatisticsComponent },
+          { path: 'profile', component: AdminProfileComponent },
         ],
       },
     ],

@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -18,20 +17,23 @@ import {
   faCalendar,
   faShieldAlt,
   faEye,
-  faEyeSlash
+  faEyeSlash,
+  faCrown,
+  faExclamationTriangle,
+  faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
 
-import { EmployeeProfileService, EmployeeProfile, UpdateProfileRequest, ChangePasswordRequest } from '../../services/employee-profile.service';
-import { AuthService } from '../../services/auth.service';
+import { AdminProfileService, AdminProfile, UpdateAdminProfileRequest, ChangePasswordRequest } from '../../../services/admin-profile.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
-  selector: 'app-employee-profile',
+  selector: 'app-admin-profile',
   standalone: true,
   imports: [CommonModule, FontAwesomeModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './employee-profile.html',
-  styleUrls: ['./employee-profile.css']
+  templateUrl: './admin-profile.html',
+  styleUrls: ['./admin-profile.css']
 })
-export class EmployeeProfileComponent implements OnInit, OnDestroy {
+export class AdminProfileComponent implements OnInit, OnDestroy {
   // Icons
   faUser = faUser;
   faEdit = faEdit;
@@ -46,9 +48,12 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
   faShieldAlt = faShieldAlt;
   faEye = faEye;
   faEyeSlash = faEyeSlash;
+  faCrown = faCrown;
+  faExclamationTriangle = faExclamationTriangle;
+  faCheckCircle = faCheckCircle;
 
   // Data properties
-  profile: EmployeeProfile | null = null;
+  profile: AdminProfile | null = null;
   isLoading = true;
   errorMessage = '';
   successMessage = '';
@@ -56,12 +61,10 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
   // Modal states
   showEditModal = false;
   showPasswordModal = false;
-  showCompleteModal = false;
 
   // Form properties
   editProfileForm!: FormGroup;
   changePasswordForm!: FormGroup;
-  completeProfileForm!: FormGroup;
 
   // Password visibility
   showCurrentPassword = false;
@@ -71,15 +74,13 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
   // Loading states
   isUpdating = false;
   isChangingPassword = false;
-  isCompletingProfile = false;
 
   private destroy$ = new Subject<void>();
 
   constructor(
-    private profileService: EmployeeProfileService,
+    private profileService: AdminProfileService,
     private authService: AuthService,
-    private fb: FormBuilder,
-    private router: Router
+    private fb: FormBuilder
   ) {
     this.initializeForms();
   }
@@ -99,6 +100,7 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
     this.editProfileForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.pattern(/^[\d\s\-\+\(\)]+$/)]],
       address: [''],
       cin: ['', [Validators.pattern(/^\d+$/)]]
@@ -109,12 +111,6 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
-
-    this.completeProfileForm = this.fb.group({
-      phone: ['', [Validators.required, Validators.pattern(/^[\d\s\-\+\(\)]+$/)]],
-      address: ['', [Validators.required]],
-      cin: ['', [Validators.required, Validators.pattern(/^\d+$/)]]
-    });
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -133,20 +129,15 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
     
-    this.profileService.getMyProfile()
+    this.profileService.getAdminProfile()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (profile) => {
           this.profile = profile;
           this.isLoading = false;
-          
-          // Show complete profile modal if profile is not completed
-          if (!profile.profileCompleted) {
-            this.showCompleteProfileModal();
-          }
         },
         error: (error) => {
-          this.errorMessage = error.message;
+          this.errorMessage = error.error?.message || 'Failed to load profile';
           this.isLoading = false;
         }
       });
@@ -170,9 +161,10 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
     this.editProfileForm.patchValue({
       firstName: this.profile.firstName || '',
       lastName: this.profile.lastName || '',
+      email: this.profile.email || '',
       phone: this.profile.phone || '',
       address: this.profile.address || '',
-      cin: this.profile.cin || ''
+      cin: this.profile.cin?.toString() || ''
     });
     
     this.showEditModal = true;
@@ -188,9 +180,9 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
   updateProfile(): void {
     if (this.editProfileForm.valid && !this.isUpdating) {
       this.isUpdating = true;
-      const request: UpdateProfileRequest = this.editProfileForm.value;
+      const request: UpdateAdminProfileRequest = this.editProfileForm.value;
       
-      this.profileService.updateMyProfile(request)
+      this.profileService.updateAdminProfile(request)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -199,7 +191,7 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
             this.isUpdating = false;
           },
           error: (error) => {
-            this.errorMessage = error.message;
+            this.errorMessage = error.error?.message || 'Failed to update profile';
             this.isUpdating = false;
           }
         });
@@ -240,53 +232,8 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
             this.isChangingPassword = false;
           },
           error: (error) => {
-            this.errorMessage = error.message;
+            this.errorMessage = error.error?.message || 'Failed to change password';
             this.isChangingPassword = false;
-          }
-        });
-    }
-  }
-
-  // Complete Profile Methods
-  showCompleteProfileModal(): void {
-    this.clearMessages();
-    this.showCompleteModal = true;
-    document.body.classList.add('modal-open');
-  }
-
-  closeCompleteModal(): void {
-    this.showCompleteModal = false;
-    this.completeProfileForm.reset();
-    document.body.classList.remove('modal-open');
-  }
-
-  completeProfile(): void {
-    if (this.completeProfileForm.valid && !this.isCompletingProfile) {
-      this.isCompletingProfile = true;
-      const request = {
-        phone: this.completeProfileForm.value.phone,
-        address: this.completeProfileForm.value.address,
-        cin: parseInt(this.completeProfileForm.value.cin)
-      };
-      
-      this.profileService.completeProfile(request)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.successMessage = response.message;
-            this.closeCompleteModal();
-            this.isCompletingProfile = false;
-            
-            // Update auth service profile status
-            const currentUser = this.authService.getCurrentUser();
-            if (currentUser) {
-              currentUser.profileCompleted = true;
-              // This will be reflected in the navigation
-            }
-          },
-          error: (error) => {
-            this.errorMessage = error.message;
-            this.isCompletingProfile = false;
           }
         });
     }
@@ -308,6 +255,7 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
     const fields = [
       this.profile.firstName,
       this.profile.lastName,
+      this.profile.email,
       this.profile.phone,
       this.profile.address,
       this.profile.cin
@@ -337,4 +285,4 @@ export class EmployeeProfileComponent implements OnInit, OnDestroy {
         break;
     }
   }
-}
+} 
