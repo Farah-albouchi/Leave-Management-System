@@ -264,3 +264,4 @@ export class StatisticsFiltersComponent implements OnInit, OnDestroy {
     return active.length > 0 ? active.join(', ') : 'No filters applied';
   }
 }
+

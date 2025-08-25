@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -8,6 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckCircle, faTimesCircle, faEye, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { LeaveRequestService } from '../../../services/leave-request.service';
 import { LeaveRequestResponseDto, LeaveStatus } from '../../../models/leave-request.models';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-requests',
@@ -95,7 +97,9 @@ approveRequest(request: LeaveRequestResponseDto): void {
 
   constructor(
     private leaveRequestService: LeaveRequestService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -282,8 +286,61 @@ approveRequest(request: LeaveRequestResponseDto): void {
   }
 
   downloadDocument(documentPath: string): void {
-    if (documentPath) {
-      window.open(`http://localhost:8080/uploads/${documentPath}`, '_blank');
+    if (this.selectedRequest?.id && documentPath) {
+      const token = this.authService.getToken();
+      if (!token) {
+        console.error('No authentication token found');
+        alert('Authentication required. Please log in again.');
+        return;
+      }
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+
+      const url = `http://localhost:8080/api/admin/leave-requests/${this.selectedRequest.id}/document`;
+      
+      this.http.get(url, { 
+        headers, 
+        responseType: 'blob',
+        observe: 'response'
+      }).subscribe({
+        next: (response) => {
+          const blob = response.body;
+          if (blob) {
+            // Extract filename from content-disposition header or use default
+            const contentDisposition = response.headers.get('content-disposition');
+            let filename = 'document';
+            
+            if (contentDisposition) {
+              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+              if (filenameMatch) {
+                filename = filenameMatch[1];
+              }
+            }
+            
+            // Create blob URL and trigger download
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+          }
+        },
+        error: (error) => {
+          console.error('Error downloading document:', error);
+          if (error.status === 404) {
+            alert('Document not found');
+          } else if (error.status === 403) {
+            alert('Access denied. Admin privileges required.');
+          } else {
+            alert('Failed to download document. Please try again.');
+          }
+        }
+      });
     }
   }
 

@@ -110,3 +110,4 @@ export interface StatisticsResponse {
   totalPages: number;
   filters: StatisticsFilters;
 }
+

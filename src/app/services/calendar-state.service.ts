@@ -94,3 +94,4 @@ export class CalendarStateService {
     return `${formatDate(selectedRange.startDate)} - ${formatDate(selectedRange.endDate)}`;
   }
 }
+

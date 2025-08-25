@@ -133,10 +133,10 @@
 
         <!-- Pending Request Items -->
         <div 
-          *ngFor="let request of pendingRequests" 
-          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <div class="flex-1">
+        *ngFor="let request of pendingRequests" 
+        class="flex justify-between gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+      <div class="flex-1 min-w-0 pr-2">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
@@ -161,20 +161,19 @@
             </div>
           </div>
           
-          <div class="flex flex-col gap-2 ml-4">
+          <div class="flex flex-row md:flex-col gap-2 ml-4 self-start shrink-0">
             <button 
-            (click)="openApproveModal(request)"
-              class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition"
+              (click)="openApproveModal(request)"
+              class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition"
             >
               Approve
             </button>
             <button 
-            (click)="openRejectModal(request)"
-              class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition"
+              (click)="openRejectModal(request)"
+              class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
             >
               Reject
             </button>
-          
           </div>
         </div>
 

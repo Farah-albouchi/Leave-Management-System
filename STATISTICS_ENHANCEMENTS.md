@@ -272,3 +272,4 @@ exportChartToPNG(chartRef: any, filename: string): void {
 - Integration with external BI tools
 - Advanced data visualization options
 - Performance monitoring dashboards
+

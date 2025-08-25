@@ -243,3 +243,4 @@ export class EmployeeProfile implements OnInit, OnDestroy {
   get currentPassword() { return this.passwordForm.get('currentPassword'); }
   get newPassword() { return this.passwordForm.get('newPassword'); }
 }
+

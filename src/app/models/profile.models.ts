@@ -39,3 +39,4 @@ export interface ProfileUpdateResponse {
   createdAt: string;
   fullName: string;
 }
+
