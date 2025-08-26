@@ -12,7 +12,8 @@ import { StatisticsComponent } from './pages/admin/statistics/statistics';
 import { AdminProfileComponent } from './pages/admin/admin-profile/admin-profile';
 import { ApplyLeave } from './pages/apply-leave/apply-leave';
 import { CalendarLeave } from './pages/calendar-leave/calendar-leave';
-import { Dashboard } from './pages/dashboard/dashboard';
+// Dashboard component is deprecated - using LeaveBalance as the new employee dashboard
+// import { Dashboard } from './pages/dashboard/dashboard';
 import { LeaveBalance } from './pages/leave-balance/leave-balance';
 import { MyRequests } from './pages/my-requests/my-requests';
 
@@ -27,13 +28,7 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { 
-        path: 'dashboard', 
-        component: Dashboard,
-        canActivate: [RoleGuard],
-        data: { requiredRole: 'EMPLOYEE' }
-      },
+      { path: '', redirectTo: 'LeaveBalance', pathMatch: 'full' },
       { 
         path: 'myRequests', 
         component: MyRequests,

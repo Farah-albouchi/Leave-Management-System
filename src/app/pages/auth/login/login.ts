@@ -128,7 +128,7 @@ export class Login implements OnInit, OnDestroy {
     if (user?.role === 'ADMIN') {
       this.router.navigate(['/admin/dashboard']);
     } else {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/LeaveBalance']);
     }
   }
 

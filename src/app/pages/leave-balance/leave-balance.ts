@@ -7,7 +7,7 @@ import { faPlus, faCalendar, faClock, faClipboard, faCheckCircle, faRefresh } fr
 import { Card } from '../../components/card/card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LeaveBalanceService } from '../../services/leave-balance.service';
-import { LeaveBalanceSummaryDto, LeaveHistoryItem } from '../../models/leave-balance.models';
+import { LeaveBalanceSummaryDto, LeaveHistoryItem, EnhancedLeaveBalanceSummaryDto } from '../../models/leave-balance.models';
 
 @Component({
   selector: 'app-leave-balance',
@@ -24,13 +24,19 @@ export class LeaveBalance implements OnInit, OnDestroy {
   faCheckCircle = faCheckCircle;
   faRefresh = faRefresh;
 
-  balanceSummary: LeaveBalanceSummaryDto = {
-    totalAllowance: 0,
-    totalUsed: 0,
-    totalRemaining: 0,
-    totalPending: 0,
+  // Use enhanced summary for better KPI data
+  enhancedSummary: EnhancedLeaveBalanceSummaryDto = {
+    totalPaidCap: 0,
+    totalUsedDays: 0,
+    totalRemainingDays: 0,
+    totalUnpaidDays: 0,
+    totalPendingCount: 0,
+    currentYear: new Date().getFullYear(),
+    isUsingDefaultCap: true,
+    systemDefaultCap: 30,
     balancesByType: [],
-    currentYear: new Date().getFullYear()
+    upcomingLeaves: [],
+    usagePercentage: 0
   };
 
   leaveHistory: LeaveHistoryItem[] = [];
@@ -38,6 +44,19 @@ export class LeaveBalance implements OnInit, OnDestroy {
   errorMessage = '';
 
   private destroy$ = new Subject<void>();
+  clampPercent(v: number): number {
+    if (!Number.isFinite(v)) return 0;
+    return Math.max(0, Math.min(100, v));
+  }
+  
+  isOverCap(used: number, cap: number): boolean {
+    return used > cap;
+  }
+  
+  overCapDays(used: number, cap: number): number {
+    return Math.max(0, used - cap);
+  }
+  
 
   constructor(
     private leaveBalanceService: LeaveBalanceService,
@@ -45,7 +64,7 @@ export class LeaveBalance implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadLeaveBalance();
+    this.loadEnhancedLeaveBalance();
     this.loadLeaveHistory();
   }
 
@@ -54,19 +73,19 @@ export class LeaveBalance implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadLeaveBalance(): void {
+  private loadEnhancedLeaveBalance(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.leaveBalanceService.getLeaveBalanceSummary()
+    this.leaveBalanceService.getEnhancedLeaveBalanceSummary()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (summary) => {
-          this.balanceSummary = summary;
+          this.enhancedSummary = summary;
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Error loading leave balance:', error);
+          console.error('Error loading enhanced leave balance:', error);
           this.errorMessage = 'Failed to load leave balance data';
           this.isLoading = false;
         }
@@ -100,7 +119,7 @@ export class LeaveBalance implements OnInit, OnDestroy {
   }
 
   refreshData(): void {
-    this.loadLeaveBalance();
+    this.loadEnhancedLeaveBalance();
     this.loadLeaveHistory();
   }
 

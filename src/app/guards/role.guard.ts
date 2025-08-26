@@ -31,7 +31,7 @@ export class RoleGuard implements CanActivate {
           if (user.role === 'ADMIN') {
             this.router.navigate(['/admin/dashboard']);
           } else {
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/LeaveBalance']);
           }
           return false;
         }

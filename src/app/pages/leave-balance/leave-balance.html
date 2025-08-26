@@ -2,8 +2,8 @@
   <!-- Header -->
   <div class="flex flex-row justify-between items-center">
     <div>
-      <h1 class="title">Leave Balance</h1>
-      <p class="text-gray-600 text-sm mt-1">Track your leave entitlements and usage for {{ balanceSummary.currentYear }}</p>
+      <h1 class="title">Dashboard</h1>
+      <p class="text-gray-600 text-sm mt-1">Track your leave entitlements and usage for {{ enhancedSummary.currentYear }}</p>
     </div>
     <div class="flex gap-2">
       <button
@@ -56,11 +56,11 @@
     </div>
   </div>
 
-  <!-- Summary Cards -->
-  <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- KPI Cards -->
+  <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
     <app-card
-      title="Total Allowance"
-      [value]="balanceSummary.totalAllowance.toString()"
+      title="Total Cap"
+      [value]="enhancedSummary.totalPaidCap.toString()"
       subtitle="days allocated"
       [icon]="faCalendar"
       bgColor="bg-blue-100"
@@ -69,8 +69,8 @@
     ></app-card>
 
     <app-card
-      title="Used This Year"
-      [value]="balanceSummary.totalUsed.toString()"
+      title="Used (Paid)"
+      [value]="enhancedSummary.totalUsedDays.toString()"
       subtitle="days taken"
       [icon]="faClock"
       bgColor="bg-green-100"
@@ -80,8 +80,8 @@
     ></app-card>
 
     <app-card
-      title="Remaining Days"
-      [value]="balanceSummary.totalRemaining.toString()"
+      title="Remaining"
+      [value]="enhancedSummary.totalRemainingDays.toString()"
       subtitle="days available"
       [icon]="faCheckCircle"
       bgColor="bg-purple-100"
@@ -90,8 +90,18 @@
     ></app-card>
 
     <app-card
-      title="Pending Requests"
-      [value]="balanceSummary.totalPending.toString()"
+      title="Unpaid Days"
+      [value]="enhancedSummary.totalUnpaidDays.toString()"
+      subtitle="unpaid taken"
+      [icon]="faClock"
+      bgColor="bg-orange-100"
+      iconColor="text-orange-600"
+      [clickable]="false"
+    ></app-card>
+
+    <app-card
+      title="Pending"
+      [value]="enhancedSummary.totalPendingCount.toString()"
       subtitle="awaiting approval"
       [icon]="faClipboard"
       bgColor="bg-yellow-100"
@@ -99,6 +109,57 @@
       [clickable]="true"
       (cardClick)="navigateToMyRequests()"
     ></app-card>
+  </div>
+
+  <!-- Overall Progress Section -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold">Annual Leave Usage</h2>
+      <div class="text-sm text-gray-600">
+        {{ enhancedSummary.totalUsedDays }}/{{ enhancedSummary.totalPaidCap }} days used
+      </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="mb-4">
+      <div class="flex justify-between text-sm text-gray-600 mb-2">
+        <span>Usage: {{ enhancedSummary.usagePercentage.toFixed(1) }}%</span>
+        <span>{{ enhancedSummary.totalRemainingDays }} days remaining</span>
+      </div>
+    
+      <!-- add overflow-hidden so anything >100% is clipped -->
+      <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div
+          class="h-3 rounded-full transition-all duration-300"
+          [style.width.%]="clampPercent(enhancedSummary.usagePercentage)"
+          [ngClass]="{
+            'bg-green-500': enhancedSummary.usagePercentage <= 50,
+            'bg-yellow-500': enhancedSummary.usagePercentage > 50 && enhancedSummary.usagePercentage <= 80,
+            'bg-red-500': enhancedSummary.usagePercentage > 80
+          }"
+        ></div>
+      </div>
+    
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-2xl font-bold text-blue-600">{{ enhancedSummary.totalPaidCap }}</div>
+        <div class="text-xs text-gray-500">Total Cap</div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-2xl font-bold text-green-600">{{ enhancedSummary.totalUsedDays }}</div>
+        <div class="text-xs text-gray-500">Used</div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-2xl font-bold text-purple-600">{{ enhancedSummary.totalRemainingDays }}</div>
+        <div class="text-xs text-gray-500">Remaining</div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-2xl font-bold text-orange-600">{{ enhancedSummary.totalUnpaidDays }}</div>
+        <div class="text-xs text-gray-500">Unpaid</div>
+      </div>
+    </div>
   </div>
 
   <!-- Leave Balance by Type -->
@@ -114,7 +175,7 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="balanceSummary.balancesByType.length === 0" class="text-center py-8">
+    <div *ngIf="enhancedSummary.balancesByType.length === 0" class="text-center py-8">
       <div class="flex flex-col items-center space-y-3">
         <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -127,9 +188,9 @@
     </div>
 
     <!-- Leave Types Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" *ngIf="balanceSummary.balancesByType.length > 0">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" *ngIf="enhancedSummary.balancesByType.length > 0">
       <div 
-        *ngFor="let balance of balanceSummary.balancesByType" 
+        *ngFor="let balance of enhancedSummary.balancesByType" 
         class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors"
       >
         <div class="flex items-center justify-between mb-4">
@@ -148,35 +209,101 @@
         <!-- Progress Bar -->
         <div class="mb-4">
           <div class="flex justify-between text-sm text-gray-600 mb-1">
-            <span>Usage: {{ getUsagePercentage(balance.usedDays, balance.totalAllowance) }}%</span>
-            <span>{{ balance.usedDays }} used</span>
+            <span>Usage: {{ getUsagePercentage(balance.usedPaidDays, balance.totalAllowance) }}%</span>
+            <span>{{ balance.usedPaidDays }} paid used</span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-2">
             <div 
               class="h-2 rounded-full transition-all duration-300"
-              [style.width.%]="getUsagePercentage(balance.usedDays, balance.totalAllowance)"
+              [style.width.%]="getUsagePercentage(balance.usedPaidDays, balance.totalAllowance)"
               [ngClass]="{
-                'bg-green-500': getUsagePercentage(balance.usedDays, balance.totalAllowance) <= 50,
-                'bg-yellow-500': getUsagePercentage(balance.usedDays, balance.totalAllowance) > 50 && getUsagePercentage(balance.usedDays, balance.totalAllowance) <= 80,
-                'bg-red-500': getUsagePercentage(balance.usedDays, balance.totalAllowance) > 80
+                'bg-green-500': getUsagePercentage(balance.usedPaidDays, balance.totalAllowance) <= 50,
+                'bg-yellow-500': getUsagePercentage(balance.usedPaidDays, balance.totalAllowance) > 50 && getUsagePercentage(balance.usedPaidDays, balance.totalAllowance) <= 80,
+                'bg-red-500': getUsagePercentage(balance.usedPaidDays, balance.totalAllowance) > 80
               }"
             ></div>
           </div>
         </div>
 
         <!-- Balance Details -->
-        <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="grid grid-cols-4 gap-3 text-center">
           <div>
             <div class="text-lg font-semibold text-green-600">{{ balance.remainingDays }}</div>
             <div class="text-xs text-gray-500">Remaining</div>
           </div>
           <div>
-            <div class="text-lg font-semibold text-blue-600">{{ balance.usedDays }}</div>
-            <div class="text-xs text-gray-500">Used</div>
+            <div class="text-lg font-semibold text-blue-600">{{ balance.usedPaidDays }}</div>
+            <div class="text-xs text-gray-500">Paid Used</div>
+          </div>
+          <div>
+            <div class="text-lg font-semibold text-orange-600">{{ balance.usedUnpaidDays }}</div>
+            <div class="text-xs text-gray-500">Unpaid</div>
           </div>
           <div>
             <div class="text-lg font-semibold text-yellow-600">{{ balance.pendingDays }}</div>
             <div class="text-xs text-gray-500">Pending</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Approved Leaves -->
+  <div class="bg-white rounded-lg shadow p-6" *ngIf="!isLoading && enhancedSummary.upcomingLeaves.length > 0">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold">Upcoming Approved Leaves</h2>
+      <span class="text-sm text-gray-500">Next 30 days</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div 
+        *ngFor="let leave of enhancedSummary.upcomingLeaves" 
+        class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+        [ngClass]="{
+          'border-red-300 bg-red-50': leave.urgencyLevel === 'immediate',
+          'border-yellow-300 bg-yellow-50': leave.urgencyLevel === 'soon',
+          'border-blue-300 bg-blue-50': leave.urgencyLevel === 'upcoming'
+        }"
+      >
+        <div class="flex justify-between items-start mb-2">
+          <div 
+            class="px-2 py-1 rounded-full text-xs font-medium"
+            [ngClass]="getLeaveTypeClasses(leave.leaveType)"
+          >
+            {{ leave.leaveTypeDisplayName }}
+          </div>
+          <div class="text-xs text-gray-500">
+            {{ leave.daysUntilStart }} days
+          </div>
+        </div>
+        
+        <div class="mb-2">
+          <div class="font-medium text-gray-900">{{ leave.dateRange }}</div>
+          <div class="text-sm text-gray-600">{{ leave.daysText }}</div>
+        </div>
+        
+        <div class="text-sm text-gray-700" *ngIf="leave.reason">
+          <span class="font-medium">Reason:</span> {{ leave.reason }}
+        </div>
+        
+        <div class="flex items-center justify-between mt-3">
+          <div class="flex items-center space-x-2">
+            <span 
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+              [ngClass]="leave.isPaid ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+            >
+              {{ leave.isPaid ? 'Paid' : 'Unpaid' }}
+            </span>
+            <span 
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+              [ngClass]="{
+                'bg-red-100 text-red-800': leave.urgencyLevel === 'immediate',
+                'bg-yellow-100 text-yellow-800': leave.urgencyLevel === 'soon',
+                'bg-blue-100 text-blue-800': leave.urgencyLevel === 'upcoming'
+              }"
+            >
+              {{ leave.urgencyLevel | titlecase }}
+            </span>
           </div>
         </div>
       </div>

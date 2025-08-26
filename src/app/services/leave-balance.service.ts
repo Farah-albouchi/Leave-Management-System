@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { LeaveBalanceSummaryDto, LeaveHistoryItem } from '../models/leave-balance.models';
+import { LeaveBalanceSummaryDto, LeaveHistoryItem, EnhancedLeaveBalanceSummaryDto } from '../models/leave-balance.models';
 import { LeaveRequestService } from './leave-request.service';
 import { LeaveRequestResponseDto } from '../models/leave-request.models';
 
@@ -33,6 +33,32 @@ export class LeaveBalanceService {
             totalPending: 0,
             balancesByType: [],
             currentYear: new Date().getFullYear()
+          });
+        })
+      );
+  }
+
+  /**
+   * Get enhanced employee leave balance summary with KPIs
+   */
+  getEnhancedLeaveBalanceSummary(): Observable<EnhancedLeaveBalanceSummaryDto> {
+    return this.http.get<EnhancedLeaveBalanceSummaryDto>(`${this.API_URL}/enhanced-leave-balance`)
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching enhanced leave balance:', error);
+          // Return default values on error
+          return of({
+            totalPaidCap: 0,
+            totalUsedDays: 0,
+            totalRemainingDays: 0,
+            totalUnpaidDays: 0,
+            totalPendingCount: 0,
+            currentYear: new Date().getFullYear(),
+            isUsingDefaultCap: true,
+            systemDefaultCap: 30,
+            balancesByType: [],
+            upcomingLeaves: [],
+            usagePercentage: 0
           });
         })
       );

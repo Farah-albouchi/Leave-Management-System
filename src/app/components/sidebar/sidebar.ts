@@ -56,11 +56,10 @@ export class SidebarComponent {
       ];
     } else {
       this.menuItems = [
-        { label: 'Dashboard', path: '/dashboard', icon: faHome },
+        { label: 'Dashboard', path: '/LeaveBalance', icon: faHome },
         { label: 'My Requests', path: '/myRequests', icon: faClipboard },
         { label: 'Apply Leave', path: '/ApplyLeave', icon: faCalendarCheck },
         { label: 'Calendar', path: '/CalendarLeave', icon: faCalendarAlt },
-        { label: 'Leave Balance', path: '/LeaveBalance', icon: faChartPie },
         { label: 'My Profile', path: '/profile', icon: faUser },
       ];
     }
